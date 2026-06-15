@@ -131,9 +131,11 @@ export class UserService {
   async delUser(id: number) {
     const user = await this.prisma.user.findUnique({ where: { id } });
     if (!user) throw new BadRequestException('用户不存在');
-    // 先删除关联表记录，再删除主表记录，避免外键约束冲突
-    await this.prisma.userRole.deleteMany({ where: { userId: id } });
-    await this.prisma.user.delete({ where: { id } });
+    // 事务保证删除原子性：关联记录与用户同时删除，防止中间状态
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userRole.deleteMany({ where: { userId: id } });
+      await tx.user.delete({ where: { id } });
+    });
     return { message: '删除成功' };
   }
 
@@ -148,14 +150,15 @@ export class UserService {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new BadRequestException('用户不存在');
 
-    // 全量覆盖：删除旧角色记录
-    await this.prisma.userRole.deleteMany({ where: { userId } });
-    // 如果新角色列表非空，则批量插入
-    if (dto.roleIds.length > 0) {
-      await this.prisma.userRole.createMany({
-        data: dto.roleIds.map(roleId => ({ userId, roleId })),
-      });
-    }
+    // 事务保证全量覆盖原子性：删除旧角色和插入新角色是一个整体
+    await this.prisma.$transaction(async (tx) => {
+      await tx.userRole.deleteMany({ where: { userId } });
+      if (dto.roleIds.length > 0) {
+        await tx.userRole.createMany({
+          data: dto.roleIds.map(roleId => ({ userId, roleId })),
+        });
+      }
+    });
     return { message: '分配成功' };
   }
 }

@@ -77,10 +77,12 @@ export class RoleService {
     // 检查角色是否存在
     const role = await this.prisma.role.findUnique({ where: { id } });
     if (!role) throw new BadRequestException('角色不存在');
-    // 级联删除关联数据
-    await this.prisma.roleMenu.deleteMany({ where: { roleId: id } });
-    await this.prisma.userRole.deleteMany({ where: { roleId: id } });
-    await this.prisma.role.delete({ where: { id } });
+    // 事务保证删除原子性：关联记录与角色同时删除
+    await this.prisma.$transaction(async (tx) => {
+      await tx.roleMenu.deleteMany({ where: { roleId: id } });
+      await tx.userRole.deleteMany({ where: { roleId: id } });
+      await tx.role.delete({ where: { id } });
+    });
     return { message: '删除成功' };
   }
 
@@ -94,14 +96,15 @@ export class RoleService {
     // 验证角色是否存在
     const role = await this.prisma.role.findUnique({ where: { id: roleId } });
     if (!role) throw new BadRequestException('角色不存在');
-    // 先删除该角色下所有菜单关联
-    await this.prisma.roleMenu.deleteMany({ where: { roleId } });
-    // 如果菜单 ID 列表不为空，则批量插入新关联
-    if (dto.menuIds.length > 0) {
-      await this.prisma.roleMenu.createMany({
-        data: dto.menuIds.map(menuId => ({ roleId, menuId })),
-      });
-    }
+    // 事务保证全量覆盖原子性：删除旧菜单关联和插入新菜单关联是一个整体
+    await this.prisma.$transaction(async (tx) => {
+      await tx.roleMenu.deleteMany({ where: { roleId } });
+      if (dto.menuIds.length > 0) {
+        await tx.roleMenu.createMany({
+          data: dto.menuIds.map(menuId => ({ roleId, menuId })),
+        });
+      }
+    });
     return { message: '分配成功' };
   }
 }

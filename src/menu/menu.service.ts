@@ -74,10 +74,11 @@ export class MenuService {
     if (menu.children.length > 0) {
       throw new BadRequestException('请先删除子菜单');
     }
-    // 删除角色-菜单关联表中与此菜单相关的记录
-    await this.prisma.roleMenu.deleteMany({ where: { menuId: id } });
-    // 最后删除菜单本身
-    await this.prisma.menu.delete({ where: { id } });
+    // 事务保证删除原子性：关联记录与菜单同时删除
+    await this.prisma.$transaction(async (tx) => {
+      await tx.roleMenu.deleteMany({ where: { menuId: id } });
+      await tx.menu.delete({ where: { id } });
+    });
     return { message: '删除成功' };
   }
 
