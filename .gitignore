@@ -4,10 +4,5 @@ dist
 .env.local
 .env.development.local
 .env.production.local
-.superpowers
-.claude
 /src/generated/prisma
 *.tsbuildinfo
-prisma.config.js
-prisma.config.js.map
-prisma.config.d.ts

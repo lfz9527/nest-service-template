@@ -1,0 +1,12 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(bash *)",
+      "Skill(superpowers:writing-plans)",
+      "Skill(superpowers:subagent-driven-development)",
+      "Bash(npm init *)",
+      "Bash(npm install *)"
+    ],
+    "defaultMode": "bypassPermissions"
+  }
+}

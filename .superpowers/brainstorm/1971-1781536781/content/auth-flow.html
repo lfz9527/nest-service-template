@@ -1,0 +1,96 @@
+<h2>认证流程 & 权限校验</h2>
+<p class="subtitle">Session + Cookie 登录流程、请求鉴权链路</p>
+
+<div class="section">
+  <h3>1. 登录流程（获取验证码 → 登录）</h3>
+  <div class="mockup">
+    <div class="mockup-header">GET /api/auth/getCaptcha → POST /api/auth/login</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 13px; line-height: 2.2; padding: 16px;">
+      <div style="display: flex; gap: 12px;">
+        <div style="flex: 1; background: #f0f4ff; border-radius: 8px; padding: 14px; border-left: 4px solid #4a6cf7;">
+          <strong>🖥 前端</strong><br>
+          <span style="color:#555;">1. GET getCaptcha →</span><br>
+          <span style="color:#555;">4. 用户填写表单 →</span><br>
+          <span style="color:#555;">5. POST login →</span>
+        </div>
+        <div style="flex: 1; background: #f0fff4; border-radius: 8px; padding: 14px; border-left: 4px solid #22c55e;">
+          <strong>⚙️ 后端</strong><br>
+          <span style="color:#555;">2. svg-captcha 生成验证码</span><br>
+          <span style="color:#555;">3. session.captcha = "A3F2"</span><br>
+          <span style="color:#555;">6. 校验 captcha → 验证密码</span><br>
+          <span style="color:#555;">7. session.userId = 1</span>
+        </div>
+        <div style="flex: 1; background: #fff8f0; border-radius: 8px; padding: 14px; border-left: 4px solid #f59e0b;">
+          <strong>🗄️ MySQL</strong><br>
+          <span style="color:#999;">—</span><br>
+          <span style="color:#999;">—</span><br>
+          <span style="color:#555;">查用户 + 验 bcrypt</span><br>
+          <span style="color:#555;">Session 写入 sessions 表</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>2. 请求鉴权链路</h3>
+  <div class="mockup">
+    <div class="mockup-header">每个请求都会经过的守卫链</div>
+    <div class="mockup-body" style="padding: 16px;">
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 16px; font-size: 14px;">
+        <div style="background: #e2e8f0; border-radius: 8px; padding: 12px 20px; text-align: center;">
+          <strong>请求到达</strong><br><span style="color:#666;">带 Cookie</span>
+        </div>
+        <span style="font-size: 20px; color: #94a3b8;">→</span>
+        <div style="background: #fef2f2; border-radius: 8px; padding: 12px 20px; text-align: center; border: 2px solid #ef4444;">
+          <strong>🔒 AuthGuard</strong><br><span style="color:#666; font-size:12px;">全局守卫</span>
+        </div>
+        <span style="font-size: 20px; color: #94a3b8;">→</span>
+        <div style="border: 2px dashed #ef4444; border-radius: 8px; padding: 10px 16px; font-size: 12px; color: #ef4444;">
+          session.userId<br>不存在？<br><strong>→ 401</strong>
+        </div>
+      </div>
+      <div style="display: flex; align-items: center; gap: 8px; font-size: 14px;">
+        <span style="color: #22c55e; margin-right: 40px;">✔ 通过</span>
+        <span style="font-size: 20px; color: #94a3b8;">→</span>
+        <div style="background: #eff6ff; border-radius: 8px; padding: 12px 20px; text-align: center; border: 2px solid #3b82f6;">
+          <strong>🔑 PermissionGuard</strong><br><span style="color:#666; font-size:12px;">仅 @Permissions() 触发</span>
+        </div>
+        <span style="font-size: 20px; color: #94a3b8;">→</span>
+        <div style="border: 2px dashed #ef4444; border-radius: 8px; padding: 10px 16px; font-size: 12px; color: #ef4444;">
+          权限 code<br>不匹配？<br><strong>→ 403</strong>
+        </div>
+        <span style="font-size: 20px; color: #94a3b8;">→</span>
+        <div style="background: #f0fdf4; border-radius: 8px; padding: 12px 20px; text-align: center; border: 2px solid #22c55e;">
+          <strong>Controller</strong><br><span style="color:#666; font-size:12px;">执行业务逻辑</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="section">
+  <h3>3. 守卫使用方式</h3>
+  <div class="mockup">
+    <div class="mockup-header">装饰器控制鉴权行为</div>
+    <div class="mockup-body" style="font-family: monospace; font-size: 13px; line-height: 2; padding: 16px;">
+      <div style="background: #f8fafc; border-radius: 6px; padding: 10px 16px; margin-bottom: 8px;">
+        <span style="color: #6b7280;">// 公开接口 — 跳过所有鉴权</span><br>
+        <span style="color: #7c3aed;">@Public</span>()<br>
+        @Get(<span style="color: #059669;">'getCaptcha'</span>)<br>
+        getCaptcha() {}
+      </div>
+      <div style="background: #f8fafc; border-radius: 6px; padding: 10px 16px; margin-bottom: 8px;">
+        <span style="color: #6b7280;">// 仅需登录 — 无额外装饰器</span><br>
+        @Get(<span style="color: #059669;">'getUserInfo'</span>)<br>
+        getUserInfo() {}
+      </div>
+      <div style="background: #f8fafc; border-radius: 6px; padding: 10px 16px; margin-bottom: 8px;">
+        <span style="color: #6b7280;">// 登录 + 指定权限</span><br>
+        <span style="color: #7c3aed;">@Permissions</span>(<span style="color: #059669;">'user:list'</span>)<br>
+        @Get(<span style="color: #059669;">'getUserList'</span>)<br>
+        getUserList() {}
+      </div>
+    </div>
+  </div>
+</div>
