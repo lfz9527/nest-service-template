@@ -21,6 +21,7 @@
     "noFallthroughCasesInSwitch": false,
     "ignoreDeprecations": "6.0",
     "esModuleInterop": true,
+    "types": ["node"],
     "paths": { "@/*": ["src/*"] }
   },
   "include": ["src/**/*"],
