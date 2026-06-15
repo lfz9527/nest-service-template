@@ -3,3 +3,5 @@ dist
 .env
 .superpowers
 .claude
+
+/src/generated/prisma

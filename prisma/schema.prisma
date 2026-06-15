@@ -1,0 +1,66 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "mysql"
+}
+
+model User {
+  id            Int         @id @default(autoincrement())
+  username      String      @unique
+  passwordHash  String
+  email         String?     @unique
+  phone         String?
+  status        Int         @default(1)
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+  userRoles     UserRole[]
+}
+
+model Role {
+  id          Int         @id @default(autoincrement())
+  name        String      @unique
+  code        String      @unique
+  description String?
+  status      Int         @default(1)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  userRoles   UserRole[]
+  roleMenus   RoleMenu[]
+}
+
+model Menu {
+  id        Int        @id @default(autoincrement())
+  name      String
+  code      String     @unique
+  parentId  Int?
+  parent    Menu?      @relation("MenuTree", fields: [parentId], references: [id])
+  children  Menu[]     @relation("MenuTree")
+  path      String?
+  icon      String?
+  sortOrder Int        @default(0)
+  status    Int        @default(1)
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  roleMenus RoleMenu[]
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id], onDelete: Cascade)
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
+
+model RoleMenu {
+  roleId Int
+  menuId Int
+  role   Role @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  menu   Menu @relation(fields: [menuId], references: [id], onDelete: Cascade)
+  @@id([roleId, menuId])
+  @@map("role_menus")
+}
