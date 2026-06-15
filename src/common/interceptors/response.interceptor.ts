@@ -21,7 +21,7 @@ export class ResponseInterceptor implements NestInterceptor {
         if (data && typeof data === 'object' && 'success' in data) {
           return data;
         }
-        return ApiResponse.ok(data);
+        return ApiResponse.success(data);
       }),
     );
   }

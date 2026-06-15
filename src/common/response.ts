@@ -14,7 +14,7 @@ export class ApiResponse<T = any> {
   /** 返回数据 */
   remark: T | null;
 
-  static ok<T>(data: T, message = '操作成功'): ApiResponse<T> {
+  static success<T>(data: T, message = '操作成功'): ApiResponse<T> {
     return { code: SUCCESS, message, success: true, remark: data };
   }
 
