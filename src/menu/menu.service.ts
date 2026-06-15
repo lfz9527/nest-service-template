@@ -1,7 +1,9 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
+import { BusinessException } from '../common/exceptions/business.exception';
+import * as code from '../common/code';
 
 /**
  * 菜单服务层
@@ -30,7 +32,7 @@ export class MenuService {
    */
   async getMenuById(id: number) {
     const menu = await this.prisma.menu.findUnique({ where: { id } });
-    if (!menu) throw new BadRequestException('菜单不存在');
+    if (!menu) throw new BusinessException(400, code.MENU_NOT_FOUND, '菜单不存在');
     return menu;
   }
 
@@ -42,7 +44,7 @@ export class MenuService {
   async addMenu(dto: CreateMenuDto) {
     // 检查菜单编码是否已被使用
     const existing = await this.prisma.menu.findUnique({ where: { code: dto.code } });
-    if (existing) throw new BadRequestException('菜单编码已存在');
+    if (existing) throw new BusinessException(400, code.MENU_CODE_EXISTS, '菜单编码已存在');
     return this.prisma.menu.create({ data: dto });
   }
 
@@ -53,7 +55,7 @@ export class MenuService {
    */
   async updateMenu(dto: UpdateMenuDto & { id?: number }) {
     const { id, ...data } = dto;
-    if (!id) throw new BadRequestException('缺少菜单ID');
+    if (!id) throw new BusinessException(400, code.BAD_REQUEST, '缺少菜单ID');
     return this.prisma.menu.update({ where: { id }, data });
   }
 
@@ -69,10 +71,10 @@ export class MenuService {
       where: { id },
       include: { children: true },
     });
-    if (!menu) throw new BadRequestException('菜单不存在');
+    if (!menu) throw new BusinessException(400, code.MENU_NOT_FOUND, '菜单不存在');
     // 如果有子菜单则不允许删除，需先删除子菜单
     if (menu.children.length > 0) {
-      throw new BadRequestException('请先删除子菜单');
+      throw new BusinessException(400, code.MENU_HAS_CHILDREN, '请先删除子菜单');
     }
     // 事务保证删除原子性：关联记录与菜单同时删除
     await this.prisma.$transaction(async (tx) => {

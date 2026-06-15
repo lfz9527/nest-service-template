@@ -1,5 +1,7 @@
-import { Injectable, CanActivate, ExecutionContext, ForbiddenException } from '@nestjs/common';
+import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { BusinessException } from '../exceptions/business.exception';
+import * as code from '../code';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PERMISSION_KEY } from '../decorators/permissions.decorator';
 
@@ -35,7 +37,7 @@ export class PermissionGuard implements CanActivate {
     const userId = request.session?.userId;
     // 用户未登录（应由 AuthGuard 提前拦截，此处作为兜底防御）
     if (!userId) {
-      throw new ForbiddenException('无权限');
+      throw new BusinessException(403, code.FORBIDDEN, '无权限');
     }
 
     // 查询用户及其关联的角色、角色下启用的菜单权限
@@ -58,7 +60,7 @@ export class PermissionGuard implements CanActivate {
 
     // 用户不存在（可能已被删除）
     if (!userWithRoles) {
-      throw new ForbiddenException('无权限');
+      throw new BusinessException(403, code.FORBIDDEN, '无权限');
     }
 
     // 收集所有已启用角色下已启用菜单的权限码
@@ -77,7 +79,7 @@ export class PermissionGuard implements CanActivate {
 
     // 判断用户是否拥有当前路由所需的权限码
     if (!menuCodes.has(requiredPermission)) {
-      throw new ForbiddenException('无权限');
+      throw new BusinessException(403, code.FORBIDDEN, '无权限');
     }
 
     return true;

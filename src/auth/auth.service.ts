@@ -1,9 +1,11 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import * as svgCaptcha from 'svg-captcha';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession } from '../common/types';
+import { BusinessException } from '../common/exceptions/business.exception';
+import * as code from '../common/code';
 
 /**
  * 认证服务
@@ -42,11 +44,11 @@ export class AuthService {
   async login(dto: LoginDto, session: AppSession): Promise<{ userId: number; username: string }> {
     // 检查 session 中是否存在验证码，不存在则说明未请求验证码
     if (!session.captcha) {
-      throw new BadRequestException('请先获取验证码');
+      throw new BusinessException(400, code.CAPTCHA_REQUIRED, '请先获取验证码');
     }
     // 比对用户输入的验证码（忽略大小写）
     if (dto.captcha.toLowerCase() !== session.captcha) {
-      throw new BadRequestException('验证码错误');
+      throw new BusinessException(400, code.CAPTCHA_ERROR, '验证码错误');
     }
     // 验证码使用后立即清除，防止重复使用
     delete session.captcha;
@@ -58,13 +60,13 @@ export class AuthService {
 
     // 用户不存在或状态非启用（status !== 1）时返回模糊的错误信息，避免信息泄露
     if (!user || user.status !== 1) {
-      throw new BadRequestException('用户名或密码错误');
+      throw new BusinessException(400, code.LOGIN_FAILED, '用户名或密码错误');
     }
 
     // 使用 bcrypt 比对明文密码与数据库中的哈希值
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
-      throw new BadRequestException('用户名或密码错误');
+      throw new BusinessException(400, code.LOGIN_FAILED, '用户名或密码错误');
     }
 
     // 登录成功后将用户 ID 写入 session
