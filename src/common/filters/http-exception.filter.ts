@@ -1,5 +1,6 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Response } from 'express';
+import { ApiResponse } from '../response';
 
 /**
  * HTTP 异常过滤器
@@ -15,16 +16,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
   catch(exception: HttpException, host: ArgumentsHost) {
     const ctx = host.switchToHttp();
     const response = ctx.getResponse<Response>();
-    // 获取 HTTP 状态码（如 401、403、404、500 等）
     const status = exception.getStatus();
-    // 获取异常消息文本
     const message = exception.message;
 
-    // 统一 JSON 响应结构：{ code, message, data }
-    response.status(status).json({
-      code: status,
-      message,
-      data: null,
-    });
+    response.status(status).json(ApiResponse.fail(status, message));
   }
 }
