@@ -76,12 +76,46 @@ async function main() {
   }
   console.log('Assigned all menus to admin role');
 
+  // 创建普通用户角色
+  const userRole = await prisma.role.upsert({
+    where: { code: 'user' },
+    update: {},
+    create: {
+      name: '普通用户',
+      code: 'user',
+      description: '基础用户权限',
+      status: 1,
+    },
+  });
+  console.log('User role:', userRole.name);
+
+  // 创建普通用户
+  const regularUser = await prisma.user.upsert({
+    where: { username: 'user' },
+    update: {},
+    create: {
+      username: 'user',
+      passwordHash: await bcrypt.hash('user123', 10),
+      email: 'user@example.com',
+      status: 1,
+    },
+  });
+  console.log('Regular user:', regularUser.username);
+
+  // 分配角色
   await prisma.userRole.upsert({
     where: { userId_roleId: { userId: adminUser.id, roleId: adminRole.id } },
     update: {},
     create: { userId: adminUser.id, roleId: adminRole.id },
   });
   console.log('Assigned admin role to admin user');
+
+  await prisma.userRole.upsert({
+    where: { userId_roleId: { userId: regularUser.id, roleId: userRole.id } },
+    update: {},
+    create: { userId: regularUser.id, roleId: userRole.id },
+  });
+  console.log('Assigned user role to regular user');
 }
 
 main()
