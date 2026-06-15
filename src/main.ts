@@ -32,8 +32,8 @@ async function bootstrap() {
       saveUninitialized: false,
       store: sessionStore,
       cookie: {
-        // Cookie 有效期 24 小时
-        maxAge: 1000 * 60 * 60 * 24,
+        // Cookie 有效期，单位毫秒
+        maxAge: Number(process.env.SESSION_MAX_AGE!),
         // 仅允许 HTTP 请求携带 Cookie，禁止客户端脚本访问
         httpOnly: true,
       },
