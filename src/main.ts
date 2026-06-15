@@ -14,18 +14,18 @@ async function bootstrap() {
   // 创建 MySQL 存储的 Session 仓库，将会话数据持久化到数据库
   const MySQLStore = createMySQLStore(session);
   const sessionStore = new MySQLStore({
-    host: process.env.SESSION_DB_HOST || 'localhost',
-    port: Number(process.env.SESSION_DB_PORT) || 3306,
-    user: process.env.SESSION_DB_USER || 'root',
-    password: process.env.SESSION_DB_PASSWORD || 'password',
-    database: process.env.SESSION_DB_NAME || 'dashboard',
+    host: process.env.SESSION_DB_HOST!,
+    port: Number(process.env.SESSION_DB_PORT!),
+    user: process.env.SESSION_DB_USER!,
+    password: process.env.SESSION_DB_PASSWORD!,
+    database: process.env.SESSION_DB_NAME!,
   });
 
   // 注册全局 Session 中间件
   app.use(
     session({
       // 签名密钥，优先使用环境变量，失败时回退到硬编码密钥
-      secret: process.env.SESSION_SECRET || 'fallback-secret',
+      secret: process.env.SESSION_SECRET!,
       // 仅在会话数据变更时重新保存，避免无效写入
       resave: false,
       // 未初始化的空会话不自动保存
