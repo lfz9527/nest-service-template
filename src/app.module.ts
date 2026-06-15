@@ -15,7 +15,10 @@ import { MenuModule } from './menu/menu.module';
 @Module({
   imports: [
     // 全局环境变量配置模块，使 .env 配置在整个应用中可用
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({
+      isGlobal: true,
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+    }),
     // 数据库访问层模块（Prisma ORM）
     PrismaModule,
     // 全局通用模块（认证守卫、权限守卫、异常过滤器）
