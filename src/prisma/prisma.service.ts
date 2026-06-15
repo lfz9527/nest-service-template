@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit, OnModuleDestroy } from '@nestjs/common';
 import { PrismaClient } from '../generated/prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 
 /**
  * Prisma 数据库服务
@@ -8,6 +9,12 @@ import { PrismaClient } from '../generated/prisma/client';
  */
 @Injectable()
 export class PrismaService extends PrismaClient implements OnModuleInit, OnModuleDestroy {
+  constructor() {
+    super({
+      adapter: new PrismaMariaDb(process.env.DATABASE_URL!),
+    });
+  }
+
   /**
    * 模块初始化时建立数据库连接
    */

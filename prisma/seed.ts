@@ -1,7 +1,15 @@
 import { PrismaClient } from '../src/generated/prisma/client';
+import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import * as bcrypt from 'bcryptjs';
+import dotenv from 'dotenv';
 
-const prisma = new PrismaClient();
+// 加载对应环境的配置文件
+const envFile = `.env.${process.env.NODE_ENV || 'development'}`;
+dotenv.config({ path: envFile });
+
+const prisma = new PrismaClient({
+  adapter: new PrismaMariaDb(process.env.DATABASE_URL!),
+});
 
 async function main() {
   const passwordHash = await bcrypt.hash('admin123', 10);
