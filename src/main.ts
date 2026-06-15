@@ -4,43 +4,46 @@ import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
 
 /**
+ * 从 DATABASE_URL 解析 MySQL 连接参数
+ * 格式：mysql://user:password@host:port/database
+ */
+function parseDbUrl(url: string) {
+  const u = new URL(url);
+  return {
+    host: u.hostname,
+    port: Number(u.port) || 3306,
+    user: u.username,
+    password: u.password,
+    database: u.pathname.replace('/', ''),
+  };
+}
+
+/**
  * 应用启动引导函数
  * 创建 NestJS 应用实例，配置 MySQL 持久化 Session 存储，并监听 3000 端口。
  */
 async function bootstrap() {
-  // 创建 NestJS 应用实例
   const app = await NestFactory.create(AppModule);
 
-  // 创建 MySQL 存储的 Session 仓库，将会话数据持久化到数据库
-  const MySQLStore = createMySQLStore(session);
-  const sessionStore = new MySQLStore({
-    host: process.env.SESSION_DB_HOST!,
-    port: Number(process.env.SESSION_DB_PORT!),
-    user: process.env.SESSION_DB_USER!,
-    password: process.env.SESSION_DB_PASSWORD!,
-    database: process.env.SESSION_DB_NAME!,
-  });
+  // 从 DATABASE_URL 解析数据库连接参数，避免维护两套配置
+  const dbConfig = parseDbUrl(process.env.DATABASE_URL!);
 
-  // 注册全局 Session 中间件
+  const MySQLStore = createMySQLStore(session);
+  const sessionStore = new MySQLStore(dbConfig);
+
   app.use(
     session({
-      // 签名密钥，优先使用环境变量，失败时回退到硬编码密钥
       secret: process.env.SESSION_SECRET!,
-      // 仅在会话数据变更时重新保存，避免无效写入
       resave: false,
-      // 未初始化的空会话不自动保存
       saveUninitialized: false,
       store: sessionStore,
       cookie: {
-        // Cookie 有效期，单位毫秒
         maxAge: Number(process.env.SESSION_MAX_AGE!),
-        // 仅允许 HTTP 请求携带 Cookie，禁止客户端脚本访问
         httpOnly: true,
       },
     }),
   );
 
-  // 启动服务，监听 3000 端口
   await app.listen(3000);
 }
 bootstrap();
