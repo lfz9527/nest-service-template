@@ -5,7 +5,6 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import * as code from '../common/code';
 
 /**
  * 用户管理服务
@@ -70,7 +69,7 @@ export class UserService {
       },
     });
     if (!user) {
-      throw new BusinessException(400, code.USER_NOT_FOUND, '用户不存在');
+      throw new BusinessException(400, '用户不存在');
     }
     return user;
   }
@@ -86,7 +85,7 @@ export class UserService {
     // 校验用户名唯一性
     const existing = await this.prisma.user.findUnique({ where: { username: dto.username } });
     if (existing) {
-      throw new BusinessException(400, code.USER_EXISTS, '用户名已存在');
+      throw new BusinessException(400, '用户名已存在');
     }
     // 使用 bcrypt 对明文密码进行哈希（10 轮盐值迭代）
     const passwordHash = await bcrypt.hash(dto.password, 10);
@@ -110,7 +109,7 @@ export class UserService {
    */
   async updateUser(dto: UpdateUserDto & { id?: number }) {
     const { id, password, ...rest } = dto;
-    if (!id) throw new BusinessException(400, code.BAD_REQUEST, '缺少用户ID');
+    if (!id) throw new BusinessException(400, '缺少用户ID');
 
     const data: any = { ...rest };
     // 如果有新密码，对其做 bcrypt 哈希后再更新
@@ -132,7 +131,7 @@ export class UserService {
    */
   async delUser(id: number) {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new BusinessException(400, code.USER_NOT_FOUND, '用户不存在');
+    if (!user) throw new BusinessException(400, '用户不存在');
     // 事务保证删除原子性：关联记录与用户同时删除，防止中间状态
     await this.prisma.$transaction(async (tx) => {
       await tx.userRole.deleteMany({ where: { userId: id } });
@@ -150,7 +149,7 @@ export class UserService {
    */
   async assignRoles(userId: number, dto: AssignRolesDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new BusinessException(400, code.USER_NOT_FOUND, '用户不存在');
+    if (!user) throw new BusinessException(400, '用户不存在');
 
     // 事务保证全量覆盖原子性：删除旧角色和插入新角色是一个整体
     await this.prisma.$transaction(async (tx) => {

@@ -1,6 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { BusinessException } from '../exceptions/business.exception';
-import * as code from '../code';
 
 /**
  * 登录认证守卫
@@ -25,7 +24,7 @@ export class AuthGuard implements CanActivate {
 
     // Session 中不存在 userId，说明未登录
     if (!request.session?.userId) {
-      throw new BusinessException(401, code.UNAUTHORIZED, '请先登录');
+      throw new BusinessException(401, '请先登录');
     }
 
     return true;

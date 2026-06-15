@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
 import { BusinessException } from '../common/exceptions/business.exception';
-import * as code from '../common/code';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -41,7 +40,7 @@ export class RoleService {
         _count: { select: { userRoles: true } },
       },
     });
-    if (!role) throw new BusinessException(400, code.ROLE_NOT_FOUND, '角色不存在');
+    if (!role) throw new BusinessException(400, '角色不存在');
     return role;
   }
 
@@ -55,7 +54,7 @@ export class RoleService {
     const existing = await this.prisma.role.findFirst({
       where: { OR: [{ name: dto.name }, { code: dto.code }] },
     });
-    if (existing) throw new BusinessException(400, code.ROLE_EXISTS, '角色名或编码已存在');
+    if (existing) throw new BusinessException(400, '角色名或编码已存在');
     return this.prisma.role.create({ data: dto });
   }
 
@@ -66,7 +65,7 @@ export class RoleService {
    */
   async updateRole(dto: UpdateRoleDto & { id?: number }) {
     const { id, ...data } = dto;
-    if (!id) throw new BusinessException(400, code.BAD_REQUEST, '缺少角色ID');
+    if (!id) throw new BusinessException(400, '缺少角色ID');
     return this.prisma.role.update({ where: { id }, data });
   }
 
@@ -78,7 +77,7 @@ export class RoleService {
   async delRole(id: number) {
     // 检查角色是否存在
     const role = await this.prisma.role.findUnique({ where: { id } });
-    if (!role) throw new BusinessException(400, code.ROLE_NOT_FOUND, '角色不存在');
+    if (!role) throw new BusinessException(400, '角色不存在');
     // 事务保证删除原子性：关联记录与角色同时删除
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { roleId: id } });
@@ -97,7 +96,7 @@ export class RoleService {
   async assignMenus(roleId: number, dto: AssignMenusDto) {
     // 验证角色是否存在
     const role = await this.prisma.role.findUnique({ where: { id: roleId } });
-    if (!role) throw new BusinessException(400, code.ROLE_NOT_FOUND, '角色不存在');
+    if (!role) throw new BusinessException(400, '角色不存在');
     // 事务保证全量覆盖原子性：删除旧菜单关联和插入新菜单关联是一个整体
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { roleId } });
