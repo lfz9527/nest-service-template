@@ -14,11 +14,11 @@ async function bootstrap() {
   // 创建 MySQL 存储的 Session 仓库，将会话数据持久化到数据库
   const MySQLStore = createMySQLStore(session);
   const sessionStore = new MySQLStore({
-    host: 'localhost',
-    port: 3306,
-    user: 'root',
-    password: 'password',
-    database: 'dashboard',
+    host: process.env.SESSION_DB_HOST || 'localhost',
+    port: Number(process.env.SESSION_DB_PORT) || 3306,
+    user: process.env.SESSION_DB_USER || 'root',
+    password: process.env.SESSION_DB_PASSWORD || 'password',
+    database: process.env.SESSION_DB_NAME || 'dashboard',
   });
 
   // 注册全局 Session 中间件
