@@ -1,6 +1,6 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { LoggerModule as PinoLoggerModule, PinoLogger } from 'nestjs-pino';
+import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
 
 /**
  * 全局日志模块
@@ -64,6 +64,6 @@ import { LoggerModule as PinoLoggerModule, PinoLogger } from 'nestjs-pino';
       },
     }),
   ],
-  exports: [PinoLogger],
+  exports: [PinoLoggerModule],
 })
 export class LoggerModule {}
