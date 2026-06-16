@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { UserModule } from './user/user.module';
 import { RoleModule } from './role/role.module';
 import { MenuModule } from './menu/menu.module';
+import { LoggerModule } from './logger/logger.module';
 
 /**
  * 应用根模块
@@ -19,6 +20,8 @@ import { MenuModule } from './menu/menu.module';
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
+    // 全局日志模块（基于 pino，从 ConfigService 读取日志配置）
+    LoggerModule,
     // 数据库访问层模块（Prisma ORM）
     PrismaModule,
     // 全局通用模块（认证守卫、权限守卫、异常过滤器）
