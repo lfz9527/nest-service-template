@@ -33,12 +33,18 @@ async function bootstrap() {
 
   app.use(
     session({
+      // 用于签名 session cookie 的密钥，防止篡改
       secret: process.env.SESSION_SECRET!,
+      // 强制每次请求不重新保存未修改的 session，减少 MySQL 写入
       resave: false,
+      // 不为未初始化的空 session（如未登录的请求）创建记录，减少存储浪费
       saveUninitialized: false,
+      // MySQL 持久化存储，重启不丢失 session
       store: sessionStore,
       cookie: {
+        // 登录有效期，单位毫秒
         maxAge: Number(process.env.SESSION_MAX_AGE!),
+        // 禁止客户端 JS 读取 cookie，防止 XSS 窃取 sessionId
         httpOnly: true,
       },
     }),
