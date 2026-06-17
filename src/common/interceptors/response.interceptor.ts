@@ -13,10 +13,6 @@ export class ResponseInterceptor implements NestInterceptor {
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
     return next.handle().pipe(
       map((data) => {
-        // 字符串类型（如 SVG 验证码）直接返回，不包装
-        if (typeof data === 'string') {
-          return data;
-        }
         // 已经是 ApiResponse 格式则直接返回
         if (data && typeof data === 'object' && 'success' in data) {
           return data;
