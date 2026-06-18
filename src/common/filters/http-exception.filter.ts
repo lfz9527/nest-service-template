@@ -1,6 +1,8 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException } from '@nestjs/common';
 import { Response } from 'express';
 import { ApiResponse } from '../response';
+import { FAIL } from '../code';
+import { BusinessException } from '../exceptions/business.exception';
 import { PinoLogger } from 'nestjs-pino';
 
 /**
@@ -30,6 +32,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
     );
 
-    response.status(httpCode).json(ApiResponse.fail(message));
+    const businessCode = exception instanceof BusinessException ? exception.businessCode : FAIL;
+    response.status(httpCode).json({ ...ApiResponse.fail(message), code: businessCode });
   }
 }

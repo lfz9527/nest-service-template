@@ -1,11 +1,15 @@
 import { HttpException } from '@nestjs/common';
+import { FAIL } from '../code';
 
 /**
  * 业务异常
- * 统一携带 HTTP 状态码，业务码固定为 -1
+ * 携带 HTTP 状态码与业务错误码，过滤器会将其写入响应
  */
 export class BusinessException extends HttpException {
-  constructor(httpCode: number, message: string) {
+  readonly businessCode: number;
+
+  constructor(httpCode: number, message: string, businessCode: number = FAIL) {
     super(message, httpCode);
+    this.businessCode = businessCode;
   }
 }
