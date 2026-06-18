@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { PermissionGuard } from './guards/permission.guard';
+import { DevGuard } from './guards/dev.guard';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 
@@ -17,6 +18,8 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
     { provide: APP_GUARD, useClass: AuthGuard },
     // 全局权限校验守卫 —— 检查接口权限码
     { provide: APP_GUARD, useClass: PermissionGuard },
+    // 全局开发环境守卫 —— 生产环境禁用 @DevOnly 标记的接口
+    { provide: APP_GUARD, useClass: DevGuard },
     // 全局响应拦截器 —— 统一包装返回格式
     { provide: APP_INTERCEPTOR, useClass: ResponseInterceptor },
     // 全局 HTTP 异常过滤器 —— 统一错误响应格式
