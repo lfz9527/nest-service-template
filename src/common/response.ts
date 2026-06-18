@@ -23,3 +23,22 @@ export class ApiResponse<T = unknown> {
     return { code: FAIL, message, success: false, data: null };
   }
 }
+
+/** 分页列表数据结构 */
+export class ListResult<T = unknown> {
+  /** 当前页数据 */
+  list: T[];
+  /** 总记录数 */
+  total: number;
+  /** 当前页码 */
+  page: number;
+  /** 每页条数 */
+  pageSize: number;
+
+  constructor(list: T[], total: number, page: number, pageSize: number) {
+    this.list = list;
+    this.total = total;
+    this.page = page;
+    this.pageSize = pageSize;
+  }
+}
