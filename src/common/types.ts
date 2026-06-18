@@ -7,3 +7,14 @@ import { Session } from 'express-session';
  * - captcha:  登录验证码（临时存储用于校验）
  */
 export type AppSession = Session & { userId?: number; captcha?: string };
+
+export interface MenuTreeNode {
+  id: number;
+  name: string;
+  code: string;
+  parentId: number | null;
+  path: string | null;
+  icon: string | null;
+  sortOrder: number;
+  children?: MenuTreeNode[];
+}

@@ -10,7 +10,7 @@ import { ApiResponse } from '../response';
  */
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {
-  intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
+  intercept(context: ExecutionContext, next: CallHandler): Observable<unknown> {
     return next.handle().pipe(
       map((data) => {
         // 已经是 ApiResponse 格式则直接返回

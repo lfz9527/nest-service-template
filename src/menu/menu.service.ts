@@ -3,6 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { MenuTreeNode } from '../common/types';
 import { PinoLogger } from 'nestjs-pino';
 
 /**
@@ -64,9 +65,9 @@ export class MenuService {
     return { message: '删除成功' };
   }
 
-  private buildTree(menus: any[]): any[] {
-    const map = new Map<number, any>();
-    const roots: any[] = [];
+  private buildTree(menus: MenuTreeNode[]): MenuTreeNode[] {
+    const map = new Map<number, MenuTreeNode>();
+    const roots: MenuTreeNode[] = [];
 
     for (const menu of menus) {
       map.set(menu.id, { ...menu, children: [] });
@@ -74,7 +75,7 @@ export class MenuService {
 
     for (const menu of map.values()) {
       if (menu.parentId && map.has(menu.parentId)) {
-        map.get(menu.parentId)!.children.push(menu);
+        map.get(menu.parentId)!.children!.push(menu);
       } else {
         roots.push(menu);
       }

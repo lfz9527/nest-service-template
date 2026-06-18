@@ -86,7 +86,7 @@ export class UserService {
     const { id, password, ...rest } = dto;
     if (!id) throw new BusinessException(400, '缺少用户ID');
 
-    const data: any = { ...rest };
+    const data: global.anyObj = { ...rest };
     if (password) {
       data.passwordHash = await bcrypt.hash(password, 10);
     }
@@ -118,7 +118,7 @@ export class UserService {
       await tx.userRole.deleteMany({ where: { userId } });
       if (dto.roleIds.length > 0) {
         await tx.userRole.createMany({
-          data: dto.roleIds.map(roleId => ({ userId, roleId })),
+          data: dto.roleIds.map((roleId) => ({ userId, roleId })),
         });
       }
     });

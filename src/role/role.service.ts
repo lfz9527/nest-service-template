@@ -77,7 +77,7 @@ export class RoleService {
       await tx.roleMenu.deleteMany({ where: { roleId } });
       if (dto.menuIds.length > 0) {
         await tx.roleMenu.createMany({
-          data: dto.menuIds.map(menuId => ({ roleId, menuId })),
+          data: dto.menuIds.map((menuId) => ({ roleId, menuId })),
         });
       }
     });

@@ -3,7 +3,7 @@ import { PrismaService } from '../prisma/prisma.service';
 import * as svgCaptcha from 'svg-captcha';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
-import { AppSession } from '../common/types';
+import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
 import { PinoLogger } from 'nestjs-pino';
 
@@ -89,7 +89,7 @@ export class AuthService {
       return null;
     }
 
-    const menuMap = new Map<number, any>();
+    const menuMap = new Map<number, MenuTreeNode>();
     for (const ur of user.userRoles) {
       if (ur.role.status !== 1) continue;
       for (const rm of ur.role.roleMenus) {
@@ -120,9 +120,9 @@ export class AuthService {
     };
   }
 
-  private buildMenuTree(menus: any[]): any[] {
-    const map = new Map<number, any>();
-    const roots: any[] = [];
+  private buildMenuTree(menus: MenuTreeNode[]): MenuTreeNode[] {
+    const map = new Map<number, MenuTreeNode>();
+    const roots: MenuTreeNode[] = [];
 
     for (const menu of menus) {
       map.set(menu.id, { ...menu, children: [] });
@@ -130,7 +130,7 @@ export class AuthService {
 
     for (const menu of map.values()) {
       if (menu.parentId && map.has(menu.parentId)) {
-        map.get(menu.parentId).children.push(menu);
+        map.get(menu.parentId)!.children!.push(menu);
       } else {
         roots.push(menu);
       }
@@ -144,9 +144,9 @@ export class AuthService {
     return roots;
   }
 
-  private sortChildren(node: any): void {
-    node.children.sort((a: any, b: any) => a.sortOrder - b.sortOrder);
-    for (const child of node.children) {
+  private sortChildren(node: MenuTreeNode): void {
+    node.children!.sort((a: MenuTreeNode, b: MenuTreeNode) => a.sortOrder - b.sortOrder);
+    for (const child of node.children!) {
       this.sortChildren(child);
     }
   }

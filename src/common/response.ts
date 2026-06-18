@@ -5,7 +5,7 @@ import { SUCCESS, FAIL } from './code';
  * code    — 业务层状态码（0=成功，-1=失败）
  * data    — 业务数据，成功时存放返回数据
  */
-export class ApiResponse<T = any> {
+export class ApiResponse<T = unknown> {
   /** 业务层状态码：0 成功，-1 失败 */
   code: number;
   /** 提示信息 */
