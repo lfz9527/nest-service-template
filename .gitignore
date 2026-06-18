@@ -6,3 +6,4 @@ dist
 .env.production.local
 /src/generated/prisma
 *.tsbuildinfo
+pnpm-lock.yaml
