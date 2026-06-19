@@ -53,6 +53,25 @@ export class RoleService {
   async updateRole(dto: UpdateRoleDto & { id?: number }) {
     const { id, ...data } = dto;
     if (!id) throw new BusinessException(400, '缺少角色ID');
+
+    // 检查角色是否存在
+    const role = await this.prisma.role.findUnique({ where: { id } });
+    if (!role) throw new BusinessException(400, '角色不存在');
+
+    // 如果修改了角色名或编码，检查是否与其他角色冲突
+    const conflicts: string[] = [];
+    if (data.name && data.name !== role.name) {
+      const existing = await this.prisma.role.findUnique({ where: { name: data.name } });
+      if (existing) conflicts.push('角色名');
+    }
+    if (data.code && data.code !== role.code) {
+      const existing = await this.prisma.role.findUnique({ where: { code: data.code } });
+      if (existing) conflicts.push('角色编码');
+    }
+    if (conflicts.length > 0) {
+      throw new BusinessException(400, `${conflicts.join('、')}已存在`);
+    }
+
     const updated = await this.prisma.role.update({ where: { id }, data });
     this.logger.info({ roleId: id }, 'Role updated');
     return updated;

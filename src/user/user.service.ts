@@ -87,7 +87,17 @@ export class UserService {
     const { id, password, ...rest } = dto;
     if (!id) throw new BusinessException(400, '缺少用户ID');
 
-    const data: global.anyObj = { ...rest };
+    // 检查用户是否存在
+    const user = await this.prisma.user.findUnique({ where: { id } });
+    if (!user) throw new BusinessException(400, '用户不存在');
+
+    // 如果修改了用户名，检查新用户名是否已被其他用户占用
+    if (rest.username && rest.username !== user.username) {
+      const existing = await this.prisma.user.findUnique({ where: { username: rest.username } });
+      if (existing) throw new BusinessException(400, '用户名已存在');
+    }
+
+    const data: Record<string, unknown> = { ...rest };
     if (password) {
       data.passwordHash = await bcrypt.hash(password, 10);
     }

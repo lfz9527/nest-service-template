@@ -3,6 +3,7 @@ import { Request } from 'express';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppSession } from '../common/types';
+import { RateLimit } from '../common/decorators/rate-limit.decorator';
 
 /**
  * 认证控制器
@@ -15,8 +16,10 @@ export class AuthController {
   /**
    * 获取登录页的图形验证码
    * 公开接口，无需登录即可访问
+   * 限流：60 秒内最多 10 次请求
    * GET /public/auth/getCaptcha
    */
+  @RateLimit({ windowSeconds: 60, max: 10 })
   @Get('/public/auth/getCaptcha')
   getCaptcha(@Session() session: AppSession) {
     const svg = this.authService.generateCaptcha(session);
@@ -26,8 +29,10 @@ export class AuthController {
   /**
    * 用户登录
    * 公开接口，验证验证码和账号密码后建立 session
+   * 限流：60 秒内最多 5 次请求
    * POST /public/auth/login
    */
+  @RateLimit({ windowSeconds: 60, max: 5 })
   @Post('/public/auth/login')
   login(@Body() dto: LoginDto, @Session() session: AppSession) {
     return this.authService.login(dto, session);

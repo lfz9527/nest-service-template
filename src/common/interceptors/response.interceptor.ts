@@ -5,8 +5,8 @@ import { ApiResponse } from '../response';
 
 /**
  * 响应拦截器
- * 统一包装所有正常返回结果为 ApiResponse 格式：{ code, message, success, remark }
- * 控制器只需返回业务数据，拦截器自动装入 remark 字段
+ * 统一包装所有正常返回结果为 ApiResponse 格式：{ code, message, success, data }
+ * 控制器只需返回业务数据，拦截器自动装入 data 字段
  */
 @Injectable()
 export class ResponseInterceptor implements NestInterceptor {

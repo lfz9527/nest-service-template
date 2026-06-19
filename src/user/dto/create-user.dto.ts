@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString, IsOptional, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
 
 /**
  * 创建用户请求数据传输对象
@@ -13,6 +13,7 @@ export class CreateUserDto {
   /** 密码（明文，服务端会做 bcrypt 哈希后入库） */
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString()
+  @MinLength(6, { message: '密码长度不能少于6位' })
   password: string;
 
   /** 邮箱（可选） */

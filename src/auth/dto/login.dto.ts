@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MinLength } from 'class-validator';
 
 /**
  * 登录请求数据传输对象
@@ -13,6 +13,7 @@ export class LoginDto {
   /** 密码 */
   @IsNotEmpty({ message: '密码不能为空' })
   @IsString()
+  @MinLength(6, { message: '密码长度不能少于6位' })
   password: string;
 
   /** 图形验证码 */

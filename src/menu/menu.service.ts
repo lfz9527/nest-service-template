@@ -43,6 +43,17 @@ export class MenuService {
   async updateMenu(dto: UpdateMenuDto & { id?: number }) {
     const { id, ...data } = dto;
     if (!id) throw new BusinessException(400, '缺少菜单ID');
+
+    // 检查菜单是否存在
+    const menu = await this.prisma.menu.findUnique({ where: { id } });
+    if (!menu) throw new BusinessException(400, '菜单不存在');
+
+    // 如果修改了编码，检查是否与其他菜单冲突
+    if (data.code && data.code !== menu.code) {
+      const existing = await this.prisma.menu.findUnique({ where: { code: data.code } });
+      if (existing) throw new BusinessException(400, '菜单编码已存在');
+    }
+
     const updated = await this.prisma.menu.update({ where: { id }, data });
     this.logger.info({ menuId: id }, 'Menu updated');
     return updated;
@@ -80,6 +91,17 @@ export class MenuService {
         roots.push(menu);
       }
     }
+
+    // 按 sortOrder 排序
+    const sort = (nodes: MenuTreeNode[]) => {
+      nodes.sort((a, b) => a.sortOrder - b.sortOrder);
+      for (const node of nodes) {
+        if (node.children && node.children.length > 0) {
+          sort(node.children);
+        }
+      }
+    };
+    sort(roots);
 
     return roots;
   }

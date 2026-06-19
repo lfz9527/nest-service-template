@@ -63,7 +63,11 @@ export class AuthService {
 
   logout(session: AppSession): void {
     const userId = session.userId;
-    session.destroy(() => {});
+    session.destroy((err) => {
+      if (err) {
+        this.logger.error({ userId, err }, 'Session destroy failed');
+      }
+    });
     this.logger.info({ userId }, 'Logout');
   }
 

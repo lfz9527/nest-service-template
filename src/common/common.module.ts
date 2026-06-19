@@ -3,6 +3,7 @@ import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { DevGuard } from './guards/dev.guard';
+import { RateLimitGuard } from './guards/rate-limit.guard';
 import { HttpExceptionFilter } from './filters/http-exception.filter';
 import { ResponseInterceptor } from './interceptors/response.interceptor';
 
@@ -14,6 +15,8 @@ import { ResponseInterceptor } from './interceptors/response.interceptor';
 @Global()
 @Module({
   providers: [
+    // 全局限流守卫 —— 对标注 @RateLimit 的路由限制请求频率
+    { provide: APP_GUARD, useClass: RateLimitGuard },
     // 全局登录认证守卫 —— 拦截未登录请求
     { provide: APP_GUARD, useClass: AuthGuard },
     // 全局权限校验守卫 —— 检查接口权限码
