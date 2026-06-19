@@ -31,8 +31,8 @@ export class PermissionGuard implements CanActivate {
       throw new BusinessException(HttpStatus.FORBIDDEN, MSG.PERMISSION.FORBIDDEN, FORBIDDEN);
     }
 
-    const userWithRoles = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const userWithRoles = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
       include: {
         userRoles: {
           include: {

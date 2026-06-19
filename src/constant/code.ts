@@ -15,8 +15,10 @@ export const TOO_MANY_REQUESTS = 429;
 // 将 NestJS HttpStatus 枚举统一出口，供全项目使用
 export { HttpStatus };
 
-// 实体状态枚举（替代 status === 1 这类魔术数）
+/** 实体业务状态枚举，用于 User / Role / Menu 的 status 字段 */
 export enum EntityStatus {
+  /** 禁用 — 用户无法登录，角色不参与权限校验，菜单不在树中展示 */
   DISABLED = 0,
+  /** 启用 — 正常使用中 */
   ENABLED = 1,
 }

@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus } from '../constant';
+import { HttpStatus, EntityStatus } from '../constant';
 import { MSG } from '../constant';
 import { CONFIG_DEFAULTS } from '../constant';
 import { ListResult } from '../common/response';
@@ -25,10 +25,12 @@ export class UserService {
     pageSize: number = CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
   ) {
     const skip = (page - 1) * pageSize;
+    const where = { deletedAt: null };
     const [list, total] = await Promise.all([
       this.prisma.user.findMany({
         skip,
         take: pageSize,
+        where,
         select: {
           id: true,
           username: true,
@@ -39,14 +41,14 @@ export class UserService {
           updatedAt: true,
         },
       }),
-      this.prisma.user.count(),
+      this.prisma.user.count({ where }),
     ]);
     return new ListResult(list, total, page, pageSize);
   }
 
   async getUserById(id: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id },
+    const user = await this.prisma.user.findFirst({
+      where: { id, deletedAt: null },
       select: {
         id: true,
         username: true,
@@ -67,7 +69,9 @@ export class UserService {
   }
 
   async addUser(dto: CreateUserDto) {
-    const existing = await this.prisma.user.findUnique({ where: { username: dto.username } });
+    const existing = await this.prisma.user.findFirst({
+      where: { username: dto.username, deletedAt: null },
+    });
     if (existing) {
       throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
     }
@@ -89,11 +93,13 @@ export class UserService {
     const { id, password, ...rest } = dto;
     if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.MISSING_ID);
 
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
     if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
 
     if (rest.username && rest.username !== user.username) {
-      const existing = await this.prisma.user.findUnique({ where: { username: rest.username } });
+      const existing = await this.prisma.user.findFirst({
+        where: { username: rest.username, deletedAt: null },
+      });
       if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
     }
 
@@ -111,18 +117,19 @@ export class UserService {
   }
 
   async delUser(id: number) {
-    const user = await this.prisma.user.findUnique({ where: { id } });
+    const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
     if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
-    await this.prisma.$transaction(async (tx) => {
-      await tx.userRole.deleteMany({ where: { userId: id } });
-      await tx.user.delete({ where: { id } });
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { deletedAt: new Date(), status: EntityStatus.DISABLED },
     });
-    this.logger.info({ userId: id }, 'User deleted');
+    this.logger.info({ userId: id }, 'User soft-deleted');
     return { message: MSG.USER.DELETE_SUCCESS };
   }
 
   async assignRoles(userId: number, dto: AssignRolesDto) {
-    const user = await this.prisma.user.findUnique({ where: { id: userId } });
+    const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
     if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
 
     await this.prisma.$transaction(async (tx) => {

@@ -40,8 +40,8 @@ export class AuthService {
     }
     delete session.captcha;
 
-    const user = await this.prisma.user.findUnique({
-      where: { username: dto.username },
+    const user = await this.prisma.user.findFirst({
+      where: { username: dto.username, deletedAt: null },
     });
 
     if (!user || user.status !== EntityStatus.ENABLED) {
@@ -71,8 +71,8 @@ export class AuthService {
   }
 
   async getUserInfo(userId: number) {
-    const user = await this.prisma.user.findUnique({
-      where: { id: userId },
+    const user = await this.prisma.user.findFirst({
+      where: { id: userId, deletedAt: null },
       include: {
         userRoles: {
           include: {
