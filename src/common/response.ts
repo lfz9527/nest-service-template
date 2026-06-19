@@ -1,5 +1,4 @@
-import { SUCCESS, FAIL } from '../constant';
-import { MSG } from '../constant';
+import { SUCCESS, FAIL, MSG } from '../constant';
 
 /**
  * 统一响应结构

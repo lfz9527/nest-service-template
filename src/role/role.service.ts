@@ -1,7 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus } from '../constant';
-import { MSG } from '../constant';
+import { HttpStatus, MSG } from '../constant';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';

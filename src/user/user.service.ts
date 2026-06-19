@@ -5,9 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus } from '../constant';
-import { MSG } from '../constant';
-import { CONFIG_DEFAULTS } from '../constant';
+import { HttpStatus, EntityStatus, MSG, CONFIG_DEFAULTS } from '../constant';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';
 
@@ -122,7 +120,7 @@ export class UserService {
 
     await this.prisma.user.update({
       where: { id },
-      data: { deletedAt: new Date(), status: EntityStatus.DISABLED },
+      data: { deletedAt: new Date(), status: EntityStatus.DISABLED, email: null },
     });
     this.logger.info({ userId: id }, 'User soft-deleted');
     return { message: MSG.USER.DELETE_SUCCESS };

@@ -1,8 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { BusinessException } from '../exceptions/business.exception';
-import { FORBIDDEN, HttpStatus, EntityStatus } from '../../constant';
-import { MSG } from '../../constant';
+import { FORBIDDEN, HttpStatus, EntityStatus, MSG } from '../../constant';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PERMISSION_KEY } from '../decorators/permissions.decorator';
 
