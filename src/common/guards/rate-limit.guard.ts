@@ -2,6 +2,9 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
 import { BusinessException } from '../exceptions/business.exception';
+import { TOO_MANY_REQUESTS, HttpStatus } from '../code';
+import { MSG } from '../messages';
+import { CONFIG_DEFAULTS } from '../config.defaults';
 
 interface HitRecord {
   count: number;
@@ -11,14 +14,11 @@ interface HitRecord {
 /**
  * 限流守卫
  * 基于内存的滑动窗口限流，配合 @RateLimit() 装饰器使用。
- * 用于防止接口被频繁调用（防刷）
  * 注意：仅适用于单进程，多实例部署请改用 Redis 实现。
  */
 @Injectable()
 export class RateLimitGuard implements CanActivate {
   private readonly store = new Map<string, HitRecord>();
-
-  /** 定时清理过期记录（每 60 秒） */
   private cleanupTimer: NodeJS.Timeout | null = null;
 
   constructor(private reflector: Reflector) {
@@ -36,7 +36,6 @@ export class RateLimitGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest();
-    // 以 IP + 路由路径作为限流标识
     const key = `${request.ip}:${request.path}`;
     const now = Date.now();
     const record = this.store.get(key);
@@ -48,7 +47,11 @@ export class RateLimitGuard implements CanActivate {
 
     record.count++;
     if (record.count > options.max) {
-      throw new BusinessException(429, '请求过于频繁，请稍后再试');
+      throw new BusinessException(
+        HttpStatus.TOO_MANY_REQUESTS,
+        MSG.RATE_LIMIT.TOO_MANY_REQUESTS,
+        TOO_MANY_REQUESTS,
+      );
     }
 
     return true;
@@ -62,10 +65,9 @@ export class RateLimitGuard implements CanActivate {
           this.store.delete(key);
         }
       }
-    }, 60_000);
+    }, CONFIG_DEFAULTS.RATE_LIMIT.CLEANUP_INTERVAL_MS);
   }
 
-  /** 手动停止清理定时器（测试用） */
   onModuleDestroy(): void {
     if (this.cleanupTimer) {
       clearInterval(this.cleanupTimer);

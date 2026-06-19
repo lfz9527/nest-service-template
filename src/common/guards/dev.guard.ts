@@ -2,6 +2,8 @@ import { Injectable, CanActivate, ExecutionContext, NotFoundException } from '@n
 import { Reflector } from '@nestjs/core';
 import { DEV_ONLY_KEY } from '../decorators/dev-only.decorator';
 
+const ENV_PRODUCTION = 'production';
+
 @Injectable()
 export class DevGuard implements CanActivate {
   constructor(private reflector: Reflector) {}
@@ -12,7 +14,7 @@ export class DevGuard implements CanActivate {
       context.getClass(),
     ]);
 
-    if (isDevOnly && process.env.NODE_ENV === 'production') {
+    if (isDevOnly && process.env.NODE_ENV === ENV_PRODUCTION) {
       throw new NotFoundException();
     }
 
