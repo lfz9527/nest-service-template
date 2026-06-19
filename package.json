@@ -11,6 +11,8 @@
     "start:dev": "nest start --watch",
     "db:setup": "npx prisma migrate dev --name init && npx prisma db seed",
     "db:migrate": "npx prisma migrate dev",
+    "db:push": "npx prisma db push",
+    "db:generate": "npx prisma generate",
     "db:seed": "npx prisma db seed",
     "start:prod": "node dist/main",
     "test": "echo \"Error: no test specified\" && exit 1",

@@ -16,7 +16,9 @@ npm run lint             # ESLint 检查 src/**/*.ts
 npm run lint:fix         # ESLint 自动修复
 npm run format           # Prettier 格式化
 npm run format:check     # Prettier 格式检查（不修改文件）
-npm run db:migrate       # 执行 Prisma 迁移
+npm run db:generate      # 生成 Prisma Client（schema 变更后执行）
+npm run db:push          # Schema 直接同步到数据库（开发用，不生成迁移文件）
+npm run db:migrate       # 执行 Prisma 迁移（生产用，生成迁移文件）
 npm run db:seed          # 填充种子数据（admin/admin123, user/user123）
 npm run db:setup         # 首次迁移 + 种子数据一步完成
 ```
