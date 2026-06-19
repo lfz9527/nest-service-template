@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsEmail, IsInt, MinLength } from 'class-validator';
+import { CONFIG_DEFAULTS } from '../../common/config.defaults';
 
 /**
  * 更新用户请求数据传输对象
@@ -13,7 +14,7 @@ export class UpdateUserDto {
   /** 新密码（非空时触发密码重哈希） */
   @IsOptional()
   @IsString()
-  @MinLength(6, { message: '密码长度不能少于6位' })
+  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, { message: '密码长度不能少于6位' })
   password?: string;
 
   /** 邮箱 */

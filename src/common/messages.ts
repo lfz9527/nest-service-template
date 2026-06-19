@@ -23,7 +23,6 @@ export const MSG = {
     NOT_FOUND: '角色不存在',
     NAME_OR_CODE_EXISTS: '角色名或编码已存在',
     MISSING_ID: '缺少角色ID',
-    ROLE_EXISTS: '角色已存在',
     DELETE_SUCCESS: '删除成功',
     ASSIGN_MENU_SUCCESS: '分配成功',
   },

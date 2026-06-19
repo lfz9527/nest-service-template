@@ -3,6 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
+import { CONFIG_DEFAULTS } from './common/config.defaults';
 
 /**
  * 必须存在的环境变量列表，缺失时启动报错
@@ -33,7 +34,7 @@ function parseDbUrl(url: string) {
   const u = new URL(url);
   return {
     host: u.hostname,
-    port: Number(u.port) || 3306,
+    port: Number(u.port) || CONFIG_DEFAULTS.DB_DEFAULT_PORT,
     user: u.username,
     password: u.password,
     database: u.pathname.replace('/', ''),
@@ -83,7 +84,7 @@ async function bootstrap() {
         // 禁止客户端 JS 读取 cookie，防止 XSS 窃取 sessionId
         httpOnly: true,
         // 限制同站请求才携带 cookie，防御 CSRF
-        sameSite: 'lax',
+        sameSite: CONFIG_DEFAULTS.SESSION_SAME_SITE,
         // 生产环境仅通过 HTTPS 传输 cookie
         secure: isProduction,
       },
