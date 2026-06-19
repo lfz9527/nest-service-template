@@ -3,8 +3,8 @@ import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
-import { API_PATH } from '../common/paths';
-import { PERM } from '../common/permissions';
+import { API_PATH } from '../constant';
+import { PERM } from '../constant';
 
 @Controller()
 export class MenuController {

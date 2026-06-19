@@ -3,7 +3,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { AppModule } from './app.module';
 import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
-import { CONFIG_DEFAULTS } from './common/config.defaults';
+import { CONFIG_DEFAULTS } from './constant';
 
 /**
  * 必须存在的环境变量列表，缺失时启动报错

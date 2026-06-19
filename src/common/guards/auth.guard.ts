@@ -1,8 +1,8 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { BusinessException } from '../exceptions/business.exception';
-import { UNAUTHORIZED, HttpStatus } from '../code';
-import { MSG } from '../messages';
-import { API_PATH } from '../paths';
+import { UNAUTHORIZED, HttpStatus } from '../../constant';
+import { MSG } from '../../constant';
+import { API_PATH } from '../../constant';
 
 /**
  * 登录认证守卫

@@ -4,8 +4,8 @@ import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { AssignMenusDto } from './dto/assign-menus.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
-import { API_PATH } from '../common/paths';
-import { PERM } from '../common/permissions';
+import { API_PATH } from '../constant';
+import { PERM } from '../constant';
 
 @Controller()
 export class RoleController {

@@ -1,5 +1,5 @@
 import { HttpException } from '@nestjs/common';
-import { FAIL } from '../code';
+import { FAIL } from '../../constant';
 
 /**
  * 业务异常

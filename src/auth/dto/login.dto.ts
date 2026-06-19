@@ -1,5 +1,5 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
-import { CONFIG_DEFAULTS } from '../../common/config.defaults';
+import { CONFIG_DEFAULTS } from '../../constant';
 
 /**
  * 登录请求数据传输对象

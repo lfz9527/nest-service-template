@@ -4,9 +4,9 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
-import { API_PATH } from '../common/paths';
-import { PERM } from '../common/permissions';
-import { CONFIG_DEFAULTS } from '../common/config.defaults';
+import { API_PATH } from '../constant';
+import { PERM } from '../constant';
+import { CONFIG_DEFAULTS } from '../constant';
 
 @Controller()
 export class UserController {

@@ -2,10 +2,10 @@ import { PrismaClient } from '../src/generated/prisma/client';
 import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import * as bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
-import { EntityStatus } from '../src/common/code';
-import { CONFIG_DEFAULTS } from '../src/common/config.defaults';
-import { PERM } from '../src/common/permissions';
-import { SUPER_ADMIN, USER } from '../src/common/role-code';
+import { EntityStatus } from '../src/constant';
+import { CONFIG_DEFAULTS } from '../src/constant';
+import { PERM } from '../src/constant';
+import { SUPER_ADMIN, USER } from '../src/constant';
 
 // 加载对应环境的配置文件
 const envFile = `.env.${process.env.NODE_ENV || 'development'}`;

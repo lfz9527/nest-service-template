@@ -5,9 +5,9 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus } from '../common/code';
-import { MSG } from '../common/messages';
-import { CONFIG_DEFAULTS } from '../common/config.defaults';
+import { HttpStatus } from '../constant';
+import { MSG } from '../constant';
+import { CONFIG_DEFAULTS } from '../constant';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';
 

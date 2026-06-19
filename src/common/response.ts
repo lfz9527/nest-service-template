@@ -1,5 +1,5 @@
-import { SUCCESS, FAIL } from './code';
-import { MSG } from './messages';
+import { SUCCESS, FAIL } from '../constant';
+import { MSG } from '../constant';
 
 /**
  * 统一响应结构

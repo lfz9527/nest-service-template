@@ -4,9 +4,9 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
-import { API_PATH } from '../common/paths';
-import { MSG } from '../common/messages';
-import { CONFIG_DEFAULTS } from '../common/config.defaults';
+import { API_PATH } from '../constant';
+import { MSG } from '../constant';
+import { CONFIG_DEFAULTS } from '../constant';
 
 /**
  * 认证控制器

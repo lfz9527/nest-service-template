@@ -1,5 +1,5 @@
 import { IsOptional, IsString, IsEmail, IsInt, MinLength } from 'class-validator';
-import { CONFIG_DEFAULTS } from '../../common/config.defaults';
+import { CONFIG_DEFAULTS } from '../../constant';
 
 /**
  * 更新用户请求数据传输对象
