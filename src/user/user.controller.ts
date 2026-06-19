@@ -4,77 +4,49 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
+import { API_PATH } from '../common/paths';
+import { PERM } from '../common/permissions';
+import { CONFIG_DEFAULTS } from '../common/config.defaults';
 
-/**
- * 用户管理控制器
- * 处理用户的增删改查、角色分配等 HTTP 请求，所有接口均需登录并拥有对应权限
- */
 @Controller()
 export class UserController {
   constructor(private userService: UserService) {}
 
-  /**
-   * 分页查询用户列表
-   * 需要 user:list 权限
-   * GET /api/user/getUserList
-   */
-  @Permissions('user:list')
-  @Get('/api/user/getUserList')
+  @Permissions(PERM.USER.LIST)
+  @Get(API_PATH.USER.LIST)
   getUserList(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
-    return this.userService.getUserList(Number(page) || 1, Number(pageSize) || 10);
+    return this.userService.getUserList(
+      Number(page) || CONFIG_DEFAULTS.DEFAULT_PAGE,
+      Number(pageSize) || CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
+    );
   }
 
-  /**
-   * 根据 ID 获取单个用户详情
-   * 需要 user:list 权限
-   * GET /api/user/getUserById
-   */
-  @Permissions('user:list')
-  @Get('/api/user/getUserById')
+  @Permissions(PERM.USER.LIST)
+  @Get(API_PATH.USER.BY_ID)
   getUserById(@Query('id') id: string) {
     return this.userService.getUserById(Number(id));
   }
 
-  /**
-   * 新增用户
-   * 需要 user:add 权限
-   * POST /api/user/addUser
-   */
-  @Permissions('user:add')
-  @Post('/api/user/addUser')
+  @Permissions(PERM.USER.ADD)
+  @Post(API_PATH.USER.ADD)
   addUser(@Body() dto: CreateUserDto) {
     return this.userService.addUser(dto);
   }
 
-  /**
-   * 更新用户信息
-   * 需要 user:update 权限
-   * POST /api/user/updateUser
-   */
-  @Permissions('user:update')
-  @Post('/api/user/updateUser')
+  @Permissions(PERM.USER.UPDATE)
+  @Post(API_PATH.USER.UPDATE)
   updateUser(@Body() dto: UpdateUserDto & { id: number }) {
     return this.userService.updateUser(dto);
   }
 
-  /**
-   * 删除用户
-   * 需要 user:delete 权限
-   * POST /api/user/delUser
-   */
-  @Permissions('user:delete')
-  @Post('/api/user/delUser')
+  @Permissions(PERM.USER.DELETE)
+  @Post(API_PATH.USER.DELETE)
   delUser(@Body('id') id: number) {
     return this.userService.delUser(Number(id));
   }
 
-  /**
-   * 为用户分配角色（全量覆盖）
-   * 需要 user:assignRole 权限
-   * POST /api/user/assignRoles
-   */
-  @Permissions('user:assignRole')
-  @Post('/api/user/assignRoles')
+  @Permissions(PERM.USER.ASSIGN_ROLE)
+  @Post(API_PATH.USER.ASSIGN_ROLES)
   assignRoles(@Body('userId') userId: number, @Body() body: AssignRolesDto) {
     return this.userService.assignRoles(Number(userId), body);
   }

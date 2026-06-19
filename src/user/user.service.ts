@@ -5,13 +5,12 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { HttpStatus } from '../common/code';
+import { MSG } from '../common/messages';
+import { CONFIG_DEFAULTS } from '../common/config.defaults';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';
 
-/**
- * 用户管理服务
- * 提供用户的增删改查、分页查询、角色分配等业务逻辑
- */
 @Injectable()
 export class UserService {
   constructor(
@@ -21,7 +20,10 @@ export class UserService {
     this.logger.setContext(UserService.name);
   }
 
-  async getUserList(page: number = 1, pageSize: number = 10) {
+  async getUserList(
+    page: number = CONFIG_DEFAULTS.DEFAULT_PAGE,
+    pageSize: number = CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
+  ) {
     const skip = (page - 1) * pageSize;
     const [list, total] = await Promise.all([
       this.prisma.user.findMany({
@@ -59,7 +61,7 @@ export class UserService {
       },
     });
     if (!user) {
-      throw new BusinessException(400, '用户不存在');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
     }
     return user;
   }
@@ -67,9 +69,9 @@ export class UserService {
   async addUser(dto: CreateUserDto) {
     const existing = await this.prisma.user.findUnique({ where: { username: dto.username } });
     if (existing) {
-      throw new BusinessException(400, '用户名已存在');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
     }
-    const passwordHash = await bcrypt.hash(dto.password, 10);
+    const passwordHash = await bcrypt.hash(dto.password, CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
     const newUser = await this.prisma.user.create({
       data: {
         username: dto.username,
@@ -85,21 +87,19 @@ export class UserService {
 
   async updateUser(dto: UpdateUserDto & { id?: number }) {
     const { id, password, ...rest } = dto;
-    if (!id) throw new BusinessException(400, '缺少用户ID');
+    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.MISSING_ID);
 
-    // 检查用户是否存在
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new BusinessException(400, '用户不存在');
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
 
-    // 如果修改了用户名，检查新用户名是否已被其他用户占用
     if (rest.username && rest.username !== user.username) {
       const existing = await this.prisma.user.findUnique({ where: { username: rest.username } });
-      if (existing) throw new BusinessException(400, '用户名已存在');
+      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
     }
 
     const data: Record<string, unknown> = { ...rest };
     if (password) {
-      data.passwordHash = await bcrypt.hash(password, 10);
+      data.passwordHash = await bcrypt.hash(password, CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
     }
     const updated = await this.prisma.user.update({
       where: { id },
@@ -112,18 +112,18 @@ export class UserService {
 
   async delUser(id: number) {
     const user = await this.prisma.user.findUnique({ where: { id } });
-    if (!user) throw new BusinessException(400, '用户不存在');
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
     await this.prisma.$transaction(async (tx) => {
       await tx.userRole.deleteMany({ where: { userId: id } });
       await tx.user.delete({ where: { id } });
     });
     this.logger.info({ userId: id }, 'User deleted');
-    return { message: '删除成功' };
+    return { message: MSG.USER.DELETE_SUCCESS };
   }
 
   async assignRoles(userId: number, dto: AssignRolesDto) {
     const user = await this.prisma.user.findUnique({ where: { id: userId } });
-    if (!user) throw new BusinessException(400, '用户不存在');
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
 
     await this.prisma.$transaction(async (tx) => {
       await tx.userRole.deleteMany({ where: { userId } });
@@ -134,6 +134,6 @@ export class UserService {
       }
     });
     this.logger.info({ userId, roleIds: dto.roleIds }, 'Roles assigned');
-    return { message: '分配成功' };
+    return { message: MSG.USER.ASSIGN_ROLE_SUCCESS };
   }
 }
