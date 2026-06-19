@@ -1,15 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { HttpStatus } from '../common/code';
+import { MSG } from '../common/messages';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
 import { AssignMenusDto } from './dto/assign-menus.dto';
 import { PinoLogger } from 'nestjs-pino';
 
-/**
- * 角色服务层
- * 封装角色相关的核心业务逻辑，包括角色的增删改查以及菜单分配
- */
 @Injectable()
 export class RoleService {
   constructor(
@@ -36,7 +34,7 @@ export class RoleService {
         _count: { select: { userRoles: true } },
       },
     });
-    if (!role) throw new BusinessException(400, '角色不存在');
+    if (!role) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.NOT_FOUND);
     return role;
   }
 
@@ -44,7 +42,7 @@ export class RoleService {
     const existing = await this.prisma.role.findFirst({
       where: { OR: [{ name: dto.name }, { code: dto.code }] },
     });
-    if (existing) throw new BusinessException(400, '角色名或编码已存在');
+    if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.NAME_OR_CODE_EXISTS);
     const newRole = await this.prisma.role.create({ data: dto });
     this.logger.info({ roleId: newRole.id, name: newRole.name }, 'Role created');
     return newRole;
@@ -52,13 +50,11 @@ export class RoleService {
 
   async updateRole(dto: UpdateRoleDto & { id?: number }) {
     const { id, ...data } = dto;
-    if (!id) throw new BusinessException(400, '缺少角色ID');
+    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.MISSING_ID);
 
-    // 检查角色是否存在
     const role = await this.prisma.role.findUnique({ where: { id } });
-    if (!role) throw new BusinessException(400, '角色不存在');
+    if (!role) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.NOT_FOUND);
 
-    // 如果修改了角色名或编码，检查是否与其他角色冲突
     const conflicts: string[] = [];
     if (data.name && data.name !== role.name) {
       const existing = await this.prisma.role.findUnique({ where: { name: data.name } });
@@ -69,7 +65,7 @@ export class RoleService {
       if (existing) conflicts.push('角色编码');
     }
     if (conflicts.length > 0) {
-      throw new BusinessException(400, `${conflicts.join('、')}已存在`);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, `${conflicts.join('、')}已存在`);
     }
 
     const updated = await this.prisma.role.update({ where: { id }, data });
@@ -79,19 +75,19 @@ export class RoleService {
 
   async delRole(id: number) {
     const role = await this.prisma.role.findUnique({ where: { id } });
-    if (!role) throw new BusinessException(400, '角色不存在');
+    if (!role) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.NOT_FOUND);
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { roleId: id } });
       await tx.userRole.deleteMany({ where: { roleId: id } });
       await tx.role.delete({ where: { id } });
     });
     this.logger.info({ roleId: id }, 'Role deleted');
-    return { message: '删除成功' };
+    return { message: MSG.ROLE.DELETE_SUCCESS };
   }
 
   async assignMenus(roleId: number, dto: AssignMenusDto) {
     const role = await this.prisma.role.findUnique({ where: { id: roleId } });
-    if (!role) throw new BusinessException(400, '角色不存在');
+    if (!role) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.ROLE.NOT_FOUND);
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { roleId } });
       if (dto.menuIds.length > 0) {
@@ -101,6 +97,6 @@ export class RoleService {
       }
     });
     this.logger.info({ roleId, menuIds: dto.menuIds }, 'Menus assigned to role');
-    return { message: '分配成功' };
+    return { message: MSG.ROLE.ASSIGN_MENU_SUCCESS };
   }
 }
