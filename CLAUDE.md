@@ -52,12 +52,12 @@ src/{feature}/
 
 ## 关键文件
 
-- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。
-- `prisma/seed.ts` — 填充管理员/普通用户账号、角色及系统菜单。
+- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。User 采用软删除（`deletedAt` 字段），Role/Menu 为物理删除。
+- `prisma/seed.ts` — 填充管理员/普通用户账号、角色（`super_admin` / `user`）及系统菜单。
+- `src/constant/` — 集中管理所有常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`）、`messages.ts`（`MSG` 中文消息）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`config.defaults.ts`（`CONFIG_DEFAULTS` 默认值）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）。
 - `src/common/response.ts` — `ApiResponse` 静态类，提供 `success(data)` 和 `fail(message)` 工厂方法。
 - `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，通过 `(httpCode, message)` 抛出。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
-- `src/common/role-code.ts` — 预定义角色编码：`admin`、`user`。
 
 ## 环境配置
 
