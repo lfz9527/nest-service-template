@@ -5,12 +5,11 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { HttpStatus, EntityStatus } from '../common/code';
+import { MSG } from '../common/messages';
+import { CONFIG_DEFAULTS } from '../common/config.defaults';
 import { PinoLogger } from 'nestjs-pino';
 
-/**
- * 认证服务
- * 负责验证码生成、用户登录/登出、用户信息获取等认证相关功能
- */
 @Injectable()
 export class AuthService {
   constructor(
@@ -22,8 +21,8 @@ export class AuthService {
 
   generateCaptcha(session: AppSession): string {
     const captcha = svgCaptcha.create({
-      size: 4,
-      noise: 2,
+      size: CONFIG_DEFAULTS.CAPTCHA.SIZE,
+      noise: CONFIG_DEFAULTS.CAPTCHA.NOISE,
       color: true,
     });
     session.captcha = captcha.text.toLowerCase();
@@ -33,11 +32,11 @@ export class AuthService {
   async login(dto: LoginDto, session: AppSession): Promise<{ userId: number; username: string }> {
     if (!session.captcha) {
       this.logger.warn('Login failed: captcha not initialized');
-      throw new BusinessException(400, '请先获取验证码');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.NEED_CAPTCHA);
     }
     if (dto.captcha.toLowerCase() !== session.captcha) {
       this.logger.warn({ username: dto.username }, 'Login failed: wrong captcha');
-      throw new BusinessException(400, '验证码错误');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.CAPTCHA_WRONG);
     }
     delete session.captcha;
 
@@ -45,15 +44,15 @@ export class AuthService {
       where: { username: dto.username },
     });
 
-    if (!user || user.status !== 1) {
+    if (!user || user.status !== EntityStatus.ENABLED) {
       this.logger.warn({ username: dto.username }, 'Login failed: user not found or disabled');
-      throw new BusinessException(400, '用户名或密码错误');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.LOGIN_FAILED);
     }
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
       this.logger.warn({ username: dto.username }, 'Login failed: wrong password');
-      throw new BusinessException(400, '用户名或密码错误');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.LOGIN_FAILED);
     }
 
     session.userId = user.id;
@@ -95,9 +94,9 @@ export class AuthService {
 
     const menuMap = new Map<number, MenuTreeNode>();
     for (const ur of user.userRoles) {
-      if (ur.role.status !== 1) continue;
+      if (ur.role.status !== EntityStatus.ENABLED) continue;
       for (const rm of ur.role.roleMenus) {
-        if (rm.menu.status !== 1) continue;
+        if (rm.menu.status !== EntityStatus.ENABLED) continue;
         if (!menuMap.has(rm.menu.id)) {
           menuMap.set(rm.menu.id, {
             id: rm.menu.id,

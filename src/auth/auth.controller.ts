@@ -4,6 +4,9 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
+import { API_PATH } from '../common/paths';
+import { MSG } from '../common/messages';
+import { CONFIG_DEFAULTS } from '../common/config.defaults';
 
 /**
  * 认证控制器
@@ -13,48 +16,36 @@ import { RateLimit } from '../common/decorators/rate-limit.decorator';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  /**
-   * 获取登录页的图形验证码
-   * 公开接口，无需登录即可访问
-   * 限流：60 秒内最多 10 次请求
-   * GET /public/auth/getCaptcha
-   */
-  @RateLimit({ windowSeconds: 60, max: 10 })
-  @Get('/public/auth/getCaptcha')
+  /** GET /public/auth/getCaptcha */
+  @RateLimit({
+    windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_WINDOW_SECONDS,
+    max: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_MAX,
+  })
+  @Get(API_PATH.AUTH.CAPTCHA)
   getCaptcha(@Session() session: AppSession) {
     const svg = this.authService.generateCaptcha(session);
     return svg;
   }
 
-  /**
-   * 用户登录
-   * 公开接口，验证验证码和账号密码后建立 session
-   * 限流：60 秒内最多 5 次请求
-   * POST /public/auth/login
-   */
-  @RateLimit({ windowSeconds: 60, max: 5 })
-  @Post('/public/auth/login')
+  /** POST /public/auth/login */
+  @RateLimit({
+    windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_WINDOW_SECONDS,
+    max: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_MAX,
+  })
+  @Post(API_PATH.AUTH.LOGIN)
   login(@Body() dto: LoginDto, @Session() session: AppSession) {
     return this.authService.login(dto, session);
   }
 
-  /**
-   * 用户登出
-   * 公开接口（需携带有效 session），销毁当前 session
-   * POST /public/auth/logout
-   */
-  @Post('/public/auth/logout')
+  /** POST /public/auth/logout */
+  @Post(API_PATH.AUTH.LOGOUT)
   logout(@Session() session: AppSession) {
     this.authService.logout(session);
-    return { message: '已退出' };
+    return { message: MSG.AUTH.LOGOUT_SUCCESS };
   }
 
-  /**
-   * 获取当前登录用户的个人信息与权限菜单
-   * 需登录后访问，从 request 中获取 session 再读取 userId
-   * GET /api/auth/getUserInfo
-   */
-  @Get('/api/auth/getUserInfo')
+  /** GET /api/auth/getUserInfo */
+  @Get(API_PATH.AUTH.USER_INFO)
   async getUserInfo(@Req() req: Request) {
     const session = req.session as AppSession;
     return this.authService.getUserInfo(session.userId!);
