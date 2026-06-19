@@ -3,13 +3,11 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
+import { HttpStatus } from '../common/code';
+import { MSG } from '../common/messages';
 import { MenuTreeNode } from '../common/types';
 import { PinoLogger } from 'nestjs-pino';
 
-/**
- * 菜单服务层
- * 封装菜单相关的核心业务逻辑，包括菜单的增删改查以及树形结构构建
- */
 @Injectable()
 export class MenuService {
   constructor(
@@ -28,13 +26,13 @@ export class MenuService {
 
   async getMenuById(id: number) {
     const menu = await this.prisma.menu.findUnique({ where: { id } });
-    if (!menu) throw new BusinessException(400, '菜单不存在');
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
     return menu;
   }
 
   async addMenu(dto: CreateMenuDto) {
     const existing = await this.prisma.menu.findUnique({ where: { code: dto.code } });
-    if (existing) throw new BusinessException(400, '菜单编码已存在');
+    if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.CODE_EXISTS);
     const newMenu = await this.prisma.menu.create({ data: dto });
     this.logger.info({ menuId: newMenu.id, code: newMenu.code }, 'Menu created');
     return newMenu;
@@ -42,16 +40,14 @@ export class MenuService {
 
   async updateMenu(dto: UpdateMenuDto & { id?: number }) {
     const { id, ...data } = dto;
-    if (!id) throw new BusinessException(400, '缺少菜单ID');
+    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.MISSING_ID);
 
-    // 检查菜单是否存在
     const menu = await this.prisma.menu.findUnique({ where: { id } });
-    if (!menu) throw new BusinessException(400, '菜单不存在');
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
 
-    // 如果修改了编码，检查是否与其他菜单冲突
     if (data.code && data.code !== menu.code) {
       const existing = await this.prisma.menu.findUnique({ where: { code: data.code } });
-      if (existing) throw new BusinessException(400, '菜单编码已存在');
+      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.CODE_EXISTS);
     }
 
     const updated = await this.prisma.menu.update({ where: { id }, data });
@@ -64,16 +60,16 @@ export class MenuService {
       where: { id },
       include: { children: true },
     });
-    if (!menu) throw new BusinessException(400, '菜单不存在');
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
     if (menu.children.length > 0) {
-      throw new BusinessException(400, '请先删除子菜单');
+      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.HAS_CHILDREN);
     }
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { menuId: id } });
       await tx.menu.delete({ where: { id } });
     });
     this.logger.info({ menuId: id }, 'Menu deleted');
-    return { message: '删除成功' };
+    return { message: MSG.MENU.DELETE_SUCCESS };
   }
 
   private buildTree(menus: MenuTreeNode[]): MenuTreeNode[] {
@@ -92,7 +88,6 @@ export class MenuService {
       }
     }
 
-    // 按 sortOrder 排序
     const sort = (nodes: MenuTreeNode[]) => {
       nodes.sort((a, b) => a.sortOrder - b.sortOrder);
       for (const node of nodes) {
