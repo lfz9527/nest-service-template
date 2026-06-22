@@ -1,0 +1,7 @@
+{
+  "not_found": "菜单不存在",
+  "code_exists": "菜单编码已存在",
+  "missing_id": "缺少菜单ID",
+  "has_children": "请先删除子菜单",
+  "delete_success": "删除成功"
+}

@@ -1,0 +1,7 @@
+{
+  "unique_constraint": "{field} 已存在，请勿重复添加",
+  "record_not_found": "目标记录不存在，可能已被删除",
+  "foreign_key_failed": "操作失败：{field} 存在关联数据无法删除",
+  "constraint_violation": "违反数据关联约束，请检查关联数据",
+  "unknown_error": "数据库操作异常 ({code})"
+}

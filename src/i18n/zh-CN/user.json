@@ -1,0 +1,7 @@
+{
+  "not_found": "用户不存在",
+  "username_exists": "用户名已存在",
+  "missing_id": "缺少用户ID",
+  "delete_success": "删除成功",
+  "assign_role_success": "分配成功"
+}

@@ -1,0 +1,10 @@
+{
+  "not_found": "角色不存在",
+  "name_or_code_exists": "角色名或编码已存在",
+  "missing_id": "缺少角色ID",
+  "delete_success": "删除成功",
+  "assign_menu_success": "分配成功",
+  "update_conflict_exists": "{fields}已存在",
+  "role_name": "角色名",
+  "role_code": "角色编码"
+}
