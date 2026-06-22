@@ -5,6 +5,7 @@ import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
 import helmet from 'helmet';
 import compression from 'compression';
+import net from 'net';
 import { CONFIG_DEFAULTS } from './constant';
 
 /**
@@ -41,6 +42,35 @@ function parseDbUrl(url: string) {
     password: u.password,
     database: u.pathname.replace('/', ''),
   };
+}
+
+/**
+ * 检查端口是否被占用
+ */
+function isPortTaken(port: number): Promise<boolean> {
+  return new Promise((resolve) => {
+    const server = net.createServer();
+    server.once('error', () => resolve(true));
+    server.once('listening', () => {
+      server.close();
+      resolve(false);
+    });
+    server.listen(port);
+  });
+}
+
+/**
+ * 开发环境：自动寻找可用端口，从 startPort 开始逐个检测
+ */
+async function resolvePort(startPort: number): Promise<number> {
+  const maxRetries = 100;
+  for (let offset = 0; offset < maxRetries; offset++) {
+    const port = startPort + offset;
+    if (!(await isPortTaken(port))) {
+      return port;
+    }
+  }
+  throw new Error(`无法找到可用端口（起始 ${startPort}，已检测 ${maxRetries} 个）`);
 }
 
 /**
@@ -83,31 +113,33 @@ async function bootstrap() {
   const MySQLStore = createMySQLStore(session);
   const sessionStore = new MySQLStore(dbConfig);
 
+  const configuredPort = Number(process.env.PORT!);
   const isProduction = process.env.NODE_ENV === 'production';
 
   app.use(
     session({
-      // 用于签名 session cookie 的密钥，防止篡改
       secret: process.env.SESSION_SECRET!,
-      // 强制每次请求不重新保存未修改的 session，减少 MySQL 写入
       resave: false,
-      // 不为未初始化的空 session（如未登录的请求）创建记录，减少存储浪费
       saveUninitialized: false,
-      // MySQL 持久化存储，重启不丢失 session
       store: sessionStore,
       cookie: {
-        // 登录有效期，单位毫秒
         maxAge: Number(process.env.SESSION_MAX_AGE!),
-        // 禁止客户端 JS 读取 cookie，防止 XSS 窃取 sessionId
         httpOnly: true,
-        // 限制同站请求才携带 cookie，防御 CSRF
         sameSite: CONFIG_DEFAULTS.SESSION_SAME_SITE,
-        // 生产环境仅通过 HTTPS 传输 cookie
         secure: isProduction,
       },
     }),
   );
 
-  await app.listen(process.env.PORT!);
+  // 生产环境：固定端口，冲突直接报错
+  // 开发环境：端口被占用时自动切换下一个可用端口
+  const port = isProduction ? configuredPort : await resolvePort(configuredPort);
+
+  if (port !== configuredPort) {
+    console.log(`⚠️  端口 ${configuredPort} 已被占用，自动切换到 ${port}`);
+  }
+
+  await app.listen(port);
+  console.log(`🚀 服务已启动: http://localhost:${port}`);
 }
 bootstrap();
