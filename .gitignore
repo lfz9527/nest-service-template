@@ -9,3 +9,5 @@ dist
 /src/generated/prisma
 *.tsbuildinfo
 pnpm-lock.yaml
+tsconfig.build.tsbuildinfo
+tsconfig.tsbuildinfo
