@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { BusinessException } from '../exceptions/business.exception';
-import { FORBIDDEN, HttpStatus, EntityStatus, MSG } from '../../constant';
+import { FORBIDDEN, HttpStatus, EntityStatus } from '../../constant';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PERMISSION_KEY } from '../decorators/permissions.decorator';
 
@@ -27,7 +27,7 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const userId = request.session?.userId;
     if (!userId) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, MSG.PERMISSION.FORBIDDEN, FORBIDDEN);
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
     }
 
     const userWithRoles = await this.prisma.user.findFirst({
@@ -48,7 +48,7 @@ export class PermissionGuard implements CanActivate {
     });
 
     if (!userWithRoles) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, MSG.PERMISSION.FORBIDDEN, FORBIDDEN);
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
     }
 
     const menuCodes = new Set<string>();
@@ -63,7 +63,7 @@ export class PermissionGuard implements CanActivate {
     }
 
     if (!menuCodes.has(requiredPermission)) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, MSG.PERMISSION.FORBIDDEN, FORBIDDEN);
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
     }
 
     return true;

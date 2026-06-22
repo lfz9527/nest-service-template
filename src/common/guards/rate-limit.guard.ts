@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
 import { BusinessException } from '../exceptions/business.exception';
-import { TOO_MANY_REQUESTS, HttpStatus, MSG, CONFIG_DEFAULTS } from '../../constant';
+import { TOO_MANY_REQUESTS, HttpStatus, CONFIG_DEFAULTS } from '../../constant';
 
 interface HitRecord {
   count: number;
@@ -47,8 +47,8 @@ export class RateLimitGuard implements CanActivate {
     if (record.count > options.max) {
       throw new BusinessException(
         HttpStatus.TOO_MANY_REQUESTS,
-        MSG.RATE_LIMIT.TOO_MANY_REQUESTS,
-        TOO_MANY_REQUESTS,
+        'rate_limit.too_many_requests',
+        { businessCode: TOO_MANY_REQUESTS },
       );
     }
 

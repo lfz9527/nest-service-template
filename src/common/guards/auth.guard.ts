@@ -1,6 +1,6 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { BusinessException } from '../exceptions/business.exception';
-import { UNAUTHORIZED, HttpStatus, MSG, API_PATH } from '../../constant';
+import { UNAUTHORIZED, HttpStatus, API_PATH } from '../../constant';
 
 /**
  * 登录认证守卫
@@ -20,7 +20,7 @@ export class AuthGuard implements CanActivate {
 
     // Session 中不存在 userId，说明未登录
     if (!request.session?.userId) {
-      throw new BusinessException(HttpStatus.UNAUTHORIZED, MSG.AUTH.LOGIN_REQUIRED, UNAUTHORIZED);
+      throw new BusinessException(HttpStatus.UNAUTHORIZED, 'auth.login_required', { businessCode: UNAUTHORIZED });
     }
 
     return true;
