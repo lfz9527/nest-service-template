@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { I18nModule, AcceptLanguageResolver } from 'nestjs-i18n';
+import * as path from 'path';
 import { AppController } from './app.controller';
 import { PrismaModule } from './prisma/prisma.module';
 import { CommonModule } from './common/common.module';
@@ -19,6 +21,16 @@ import { LoggerModule } from './logger/logger.module';
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
+    }),
+    // 国际化模块
+    I18nModule.forRoot({
+      fallbackLanguage: 'zh-CN',
+      loaderOptions: {
+        path: path.join(__dirname, 'i18n'),
+        watch: process.env.NODE_ENV === 'development',
+      },
+      resolvers: [AcceptLanguageResolver],
+      typesOutputPath: path.join(__dirname, '../generated/i18n.generated.ts'),
     }),
     // 全局日志模块（基于 pino，从 ConfigService 读取日志配置）
     LoggerModule,
