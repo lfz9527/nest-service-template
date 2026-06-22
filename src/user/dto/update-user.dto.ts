@@ -1,4 +1,5 @@
 import { IsOptional, IsString, IsEmail, IsInt, MinLength } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { CONFIG_DEFAULTS } from '../../constant';
 
 /**
@@ -14,12 +15,14 @@ export class UpdateUserDto {
   /** 新密码（非空时触发密码重哈希） */
   @IsOptional()
   @IsString()
-  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, { message: '密码长度不能少于6位' })
+  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
+    message: i18nValidationMessage('validation.password_min_length'),
+  })
   password?: string;
 
   /** 邮箱 */
   @IsOptional()
-  @IsEmail({}, { message: '邮箱格式不正确' })
+  @IsEmail({}, { message: i18nValidationMessage('validation.email_invalid') })
   email?: string;
 
   /** 手机号 */

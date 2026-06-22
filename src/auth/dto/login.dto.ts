@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, MinLength } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { CONFIG_DEFAULTS } from '../../constant';
 
 /**
@@ -7,18 +8,20 @@ import { CONFIG_DEFAULTS } from '../../constant';
  */
 export class LoginDto {
   /** 用户名 */
-  @IsNotEmpty({ message: '用户名不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.username_required') })
   @IsString()
   username: string;
 
   /** 密码 */
-  @IsNotEmpty({ message: '密码不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.password_required') })
   @IsString()
-  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, { message: '密码长度不能少于6位' })
+  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
+    message: i18nValidationMessage('validation.password_min_length'),
+  })
   password: string;
 
   /** 图形验证码 */
-  @IsNotEmpty({ message: '验证码不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.captcha_required') })
   @IsString()
   captcha: string;
 }

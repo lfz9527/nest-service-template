@@ -1,0 +1,11 @@
+{
+  "username_required": "Username is required",
+  "password_required": "Password is required",
+  "password_min_length": "Password must be at least {min} characters",
+  "email_invalid": "Invalid email format",
+  "captcha_required": "Captcha is required",
+  "role_name_required": "Role name is required",
+  "role_code_required": "Role code is required",
+  "menu_name_required": "Menu name is required",
+  "menu_code_required": "Menu code is required"
+}

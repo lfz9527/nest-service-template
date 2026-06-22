@@ -1,0 +1,11 @@
+{
+  "username_required": "用户名不能为空",
+  "password_required": "密码不能为空",
+  "password_min_length": "密码长度不能少于{min}位",
+  "email_invalid": "邮箱格式不正确",
+  "captcha_required": "验证码不能为空",
+  "role_name_required": "角色名不能为空",
+  "role_code_required": "角色编码不能为空",
+  "menu_name_required": "菜单名不能为空",
+  "menu_code_required": "菜单编码不能为空"
+}

@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 import { CONFIG_DEFAULTS } from '../../constant';
 
 /**
@@ -7,19 +8,21 @@ import { CONFIG_DEFAULTS } from '../../constant';
  */
 export class CreateUserDto {
   /** 用户名 */
-  @IsNotEmpty({ message: '用户名不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.username_required') })
   @IsString()
   username: string;
 
   /** 密码（明文，服务端会做 bcrypt 哈希后入库） */
-  @IsNotEmpty({ message: '密码不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.password_required') })
   @IsString()
-  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, { message: '密码长度不能少于6位' })
+  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
+    message: i18nValidationMessage('validation.password_min_length'),
+  })
   password: string;
 
   /** 邮箱（可选） */
   @IsOptional()
-  @IsEmail({}, { message: '邮箱格式不正确' })
+  @IsEmail({}, { message: i18nValidationMessage('validation.email_invalid') })
   email?: string;
 
   /** 手机号（可选） */

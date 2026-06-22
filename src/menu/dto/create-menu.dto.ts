@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional, IsInt } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 /**
  * 创建菜单 DTO（数据传输对象）
@@ -6,12 +7,12 @@ import { IsNotEmpty, IsString, IsOptional, IsInt } from 'class-validator';
  */
 export class CreateMenuDto {
   /** 菜单名称，必填 */
-  @IsNotEmpty({ message: '菜单名不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.menu_name_required') })
   @IsString()
   name: string;
 
   /** 菜单编码（唯一标识），必填 */
-  @IsNotEmpty({ message: '菜单编码不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.menu_code_required') })
   @IsString()
   code: string;
 

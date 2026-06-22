@@ -1,4 +1,5 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
+import { i18nValidationMessage } from 'nestjs-i18n';
 
 /**
  * 创建角色 DTO（数据传输对象）
@@ -6,12 +7,12 @@ import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
  */
 export class CreateRoleDto {
   /** 角色名称，必填且必须为字符串 */
-  @IsNotEmpty({ message: '角色名不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.role_name_required') })
   @IsString()
   name: string;
 
   /** 角色编码（唯一标识），必填且必须为字符串 */
-  @IsNotEmpty({ message: '角色编码不能为空' })
+  @IsNotEmpty({ message: i18nValidationMessage('validation.role_code_required') })
   @IsString()
   code: string;
 

@@ -1,5 +1,5 @@
 import { NestFactory } from '@nestjs/core';
-import { ValidationPipe } from '@nestjs/common';
+import { I18nValidationPipe } from 'nestjs-i18n';
 import { AppModule } from './app.module';
 import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
@@ -53,7 +53,7 @@ async function bootstrap() {
 
   // 全局验证管道 —— 自动校验 DTO 并过滤未声明字段
   app.useGlobalPipes(
-    new ValidationPipe({
+    new I18nValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: false,
       transform: true,
