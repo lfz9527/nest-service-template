@@ -30,7 +30,7 @@ import { LoggerModule } from './logger/logger.module';
         watch: process.env.NODE_ENV === 'development',
       },
       resolvers: [AcceptLanguageResolver],
-      typesOutputPath: path.join(__dirname, '../generated/i18n.generated.ts'),
+      typesOutputPath: path.join(__dirname, '../src/generated/i18n.generated.ts'),
     }),
     // 全局日志模块（基于 pino，从 ConfigService 读取日志配置）
     LoggerModule,
