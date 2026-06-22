@@ -1,4 +1,4 @@
-import { SUCCESS, FAIL, MSG } from '../constant';
+import { SUCCESS, FAIL } from '../constant';
 
 /**
  * 统一响应结构
@@ -11,7 +11,7 @@ export class ApiResponse<T = unknown> {
   success: boolean;
   data: T | null;
 
-  static success<T>(data: T, message = MSG.COMMON.SUCCESS): ApiResponse<T> {
+  static success<T>(data: T, message: string): ApiResponse<T> {
     return { code: SUCCESS, message, success: true, data };
   }
 
