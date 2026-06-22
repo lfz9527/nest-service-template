@@ -4,7 +4,7 @@ import prettier from 'eslint-config-prettier';
 
 export default [
   {
-    ignores: ['dist/**', 'node_modules/**', 'prisma/**'],
+    ignores: ['dist/**', 'node_modules/**', 'prisma/**', 'src/generated/**'],
   },
   {
     files: ['src/**/*.ts'],
