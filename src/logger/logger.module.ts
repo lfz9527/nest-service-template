@@ -1,6 +1,7 @@
 import { Global, Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
+import { randomUUID } from 'crypto';
 
 /**
  * 全局日志模块
@@ -28,6 +29,7 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
           return {
             pinoHttp: {
               level,
+              genReqId: () => randomUUID(),
               transport: {
                 target: 'pino-pretty',
                 options: {
@@ -44,6 +46,7 @@ import { LoggerModule as PinoLoggerModule } from 'nestjs-pino';
         return {
           pinoHttp: {
             level,
+            genReqId: () => randomUUID(),
             transport: {
               targets: [
                 {

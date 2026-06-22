@@ -5,7 +5,7 @@ import { UNAUTHORIZED, HttpStatus, API_PATH } from '../../constant';
 /**
  * 登录认证守卫
  * 拦截所有请求，检查 Session 中是否包含有效的用户 ID。
- * 路径以 /public/ 开头的接口免登录校验。
+ * 路径以 /public/ 开头或匹配 PUBLIC_EXACT 的接口免登录校验。
  */
 @Injectable()
 export class AuthGuard implements CanActivate {
@@ -13,8 +13,11 @@ export class AuthGuard implements CanActivate {
   canActivate(context: ExecutionContext): boolean {
     const request = context.switchToHttp().getRequest();
 
-    // 公开路径（如验证码、登录接口）直接放行，无需登录
-    if (request.path.startsWith(API_PATH.PUBLIC_PREFIX)) {
+    // 公开路径（验证码、登录、健康检查等）直接放行，无需登录
+    if (
+      request.path.startsWith(API_PATH.PUBLIC_PREFIX) ||
+      API_PATH.PUBLIC_EXACT.includes(request.path)
+    ) {
       return true;
     }
 

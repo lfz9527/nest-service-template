@@ -3,6 +3,7 @@ import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
+import { PaginationDto } from '../common/dto/pagination.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
 import { API_PATH, PERM, CONFIG_DEFAULTS } from '../constant';
 
@@ -12,10 +13,10 @@ export class UserController {
 
   @Permissions(PERM.USER.LIST)
   @Get(API_PATH.USER.LIST)
-  getUserList(@Query('page') page?: string, @Query('pageSize') pageSize?: string) {
+  getUserList(@Query() dto: PaginationDto) {
     return this.userService.getUserList(
-      Number(page) || CONFIG_DEFAULTS.DEFAULT_PAGE,
-      Number(pageSize) || CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
+      dto.page || CONFIG_DEFAULTS.DEFAULT_PAGE,
+      dto.pageSize || CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
     );
   }
 

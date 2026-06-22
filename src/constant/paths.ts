@@ -29,4 +29,6 @@ export const API_PATH = {
     DELETE: '/api/menu/delMenu',
   },
   PUBLIC_PREFIX: '/public/',
+  /** 精确匹配的公开路径（不要求登录） */
+  PUBLIC_EXACT: ['/'],
 } as const;

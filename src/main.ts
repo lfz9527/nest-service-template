@@ -3,6 +3,8 @@ import { I18nValidationPipe } from 'nestjs-i18n';
 import { AppModule } from './app.module';
 import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
+import helmet from 'helmet';
+import compression from 'compression';
 import { CONFIG_DEFAULTS } from './constant';
 
 /**
@@ -50,6 +52,21 @@ async function bootstrap() {
   validateEnv();
 
   const app = await NestFactory.create(AppModule);
+
+  // 安全头 —— 防 XSS、点击劫持、MIME 嗅探等
+  app.use(helmet());
+
+  // 跨域 —— 前后端分离时允许浏览器跨域请求（credentials 模式）
+  app.enableCors({
+    origin: true,
+    credentials: true,
+  });
+
+  // 响应压缩 —— JSON 返回 gzip，大幅缩小传输体积
+  app.use(compression());
+
+  // 优雅退出 —— Docker/K8s SIGTERM 时等待当前请求完成
+  app.enableShutdownHooks();
 
   // 全局验证管道 —— 自动校验 DTO 并过滤未声明字段
   app.useGlobalPipes(
