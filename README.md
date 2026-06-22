@@ -57,7 +57,7 @@ curl http://localhost:3000/api/user/list \
 
 | 路径 | 登录 | 说明 |
 |------|------|------|
-| `GET /` | — | 健康检查 |
+| `GET /health` | — | 健康检查 |
 | `GET /public/auth/getCaptcha` | — | 获取图形验证码 |
 | `POST /public/auth/login` | — | 登录 |
 | `POST /public/auth/logout` | — | 登出 |

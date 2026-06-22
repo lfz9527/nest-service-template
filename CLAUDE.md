@@ -50,7 +50,7 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 **路由规范**：
 - `/public/auth/*` — 无需登录（登录、验证码、登出）
 - `/api/{module}/*` — 需登录，配合 `@Permissions()` 权限守卫
-- 健康检查：`GET /` 返回 `{ status: 'ok' }`
+- 健康检查：`GET /health` 返回 `{ status: 'ok' }`
 
 **模块结构**：每个功能模块（auth、user、role、menu）遵循 NestJS 惯例：
 ```

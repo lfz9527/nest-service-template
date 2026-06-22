@@ -8,9 +8,9 @@ import { Controller, Get } from '@nestjs/common';
 export class AppController {
   /**
    * 健康检查接口
-   * GET / —— 返回简单 JSON 表示服务运行正常。
+   * GET /health —— 返回简单 JSON 表示服务运行正常。
    */
-  @Get()
+  @Get('health')
   health() {
     return { status: 'ok' };
   }

@@ -30,5 +30,5 @@ export const API_PATH = {
   },
   PUBLIC_PREFIX: '/public/',
   /** 精确匹配的公开路径（不要求登录） */
-  PUBLIC_EXACT: ['/'],
+  PUBLIC_EXACT: ['/health'],
 } as const;
