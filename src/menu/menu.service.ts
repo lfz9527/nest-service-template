@@ -3,15 +3,17 @@ import { PrismaService } from '../prisma/prisma.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, MSG } from '../constant';
+import { HttpStatus } from '../constant';
 import { MenuTreeNode } from '../common/types';
 import { PinoLogger } from 'nestjs-pino';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class MenuService {
   constructor(
     private prisma: PrismaService,
     private readonly logger: PinoLogger,
+    private i18n: I18nService,
   ) {
     this.logger.setContext(MenuService.name);
   }
@@ -25,13 +27,13 @@ export class MenuService {
 
   async getMenuById(id: number) {
     const menu = await this.prisma.menu.findUnique({ where: { id } });
-    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.not_found');
     return menu;
   }
 
   async addMenu(dto: CreateMenuDto) {
     const existing = await this.prisma.menu.findUnique({ where: { code: dto.code } });
-    if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.CODE_EXISTS);
+    if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.code_exists');
     const newMenu = await this.prisma.menu.create({ data: dto });
     this.logger.info({ menuId: newMenu.id, code: newMenu.code }, 'Menu created');
     return newMenu;
@@ -39,14 +41,14 @@ export class MenuService {
 
   async updateMenu(dto: UpdateMenuDto & { id?: number }) {
     const { id, ...data } = dto;
-    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.MISSING_ID);
+    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.missing_id');
 
     const menu = await this.prisma.menu.findUnique({ where: { id } });
-    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.not_found');
 
     if (data.code && data.code !== menu.code) {
       const existing = await this.prisma.menu.findUnique({ where: { code: data.code } });
-      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.CODE_EXISTS);
+      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.code_exists');
     }
 
     const updated = await this.prisma.menu.update({ where: { id }, data });
@@ -59,16 +61,16 @@ export class MenuService {
       where: { id },
       include: { children: true },
     });
-    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.NOT_FOUND);
+    if (!menu) throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.not_found');
     if (menu.children.length > 0) {
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.MENU.HAS_CHILDREN);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'menu.has_children');
     }
     await this.prisma.$transaction(async (tx) => {
       await tx.roleMenu.deleteMany({ where: { menuId: id } });
       await tx.menu.delete({ where: { id } });
     });
     this.logger.info({ menuId: id }, 'Menu deleted');
-    return { message: MSG.MENU.DELETE_SUCCESS };
+    return { message: this.i18n.t('menu.delete_success') };
   }
 
   private buildTree(menus: MenuTreeNode[]): MenuTreeNode[] {
