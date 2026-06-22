@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus, MSG, CONFIG_DEFAULTS } from '../constant';
+import { HttpStatus, EntityStatus, CONFIG_DEFAULTS } from '../constant';
 import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
@@ -30,11 +30,11 @@ export class AuthService {
   async login(dto: LoginDto, session: AppSession): Promise<{ userId: number; username: string }> {
     if (!session.captcha) {
       this.logger.warn('Login failed: captcha not initialized');
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.NEED_CAPTCHA);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.need_captcha');
     }
     if (dto.captcha.toLowerCase() !== session.captcha) {
       this.logger.warn({ username: dto.username }, 'Login failed: wrong captcha');
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.CAPTCHA_WRONG);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.captcha_wrong');
     }
     delete session.captcha;
 
@@ -44,13 +44,13 @@ export class AuthService {
 
     if (!user || user.status !== EntityStatus.ENABLED) {
       this.logger.warn({ username: dto.username }, 'Login failed: user not found or disabled');
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.LOGIN_FAILED);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.login_failed');
     }
 
     const valid = await bcrypt.compare(dto.password, user.passwordHash);
     if (!valid) {
       this.logger.warn({ username: dto.username }, 'Login failed: wrong password');
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.AUTH.LOGIN_FAILED);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.login_failed');
     }
 
     session.userId = user.id;

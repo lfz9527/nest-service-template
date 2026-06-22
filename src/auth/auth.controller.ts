@@ -4,7 +4,8 @@ import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
-import { API_PATH, MSG, CONFIG_DEFAULTS } from '../constant';
+import { API_PATH, CONFIG_DEFAULTS } from '../constant';
+import { I18nService } from 'nestjs-i18n';
 
 /**
  * 认证控制器
@@ -12,7 +13,10 @@ import { API_PATH, MSG, CONFIG_DEFAULTS } from '../constant';
  */
 @Controller()
 export class AuthController {
-  constructor(private authService: AuthService) {}
+  constructor(
+    private authService: AuthService,
+    private i18n: I18nService,
+  ) {}
 
   /** GET /public/auth/getCaptcha */
   @RateLimit({
@@ -39,7 +43,7 @@ export class AuthController {
   @Post(API_PATH.AUTH.LOGOUT)
   logout(@Session() session: AppSession) {
     this.authService.logout(session);
-    return { message: MSG.AUTH.LOGOUT_SUCCESS };
+    return { message: this.i18n.t('auth.logout_success') };
   }
 
   /** GET /api/auth/getUserInfo */
