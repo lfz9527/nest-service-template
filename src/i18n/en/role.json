@@ -1,0 +1,10 @@
+{
+  "not_found": "Role not found",
+  "name_or_code_exists": "Role name or code already exists",
+  "missing_id": "Missing role ID",
+  "delete_success": "Deleted successfully",
+  "assign_menu_success": "Menus assigned",
+  "update_conflict_exists": "{fields} already exists",
+  "role_name": "role name",
+  "role_code": "role code"
+}

@@ -1,0 +1,7 @@
+{
+  "not_found": "User not found",
+  "username_exists": "Username already exists",
+  "missing_id": "Missing user ID",
+  "delete_success": "Deleted successfully",
+  "assign_role_success": "Roles assigned"
+}

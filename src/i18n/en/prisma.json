@@ -1,0 +1,7 @@
+{
+  "unique_constraint": "{field} already exists, please do not add duplicates",
+  "record_not_found": "Target record not found, it may have been deleted",
+  "foreign_key_failed": "Operation failed: {field} has associated data and cannot be deleted",
+  "constraint_violation": "Data constraint violation, please check related data",
+  "unknown_error": "Database error ({code})"
+}

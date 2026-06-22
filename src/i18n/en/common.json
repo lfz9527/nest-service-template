@@ -1,0 +1,6 @@
+{
+  "success": "Operation successful",
+  "bad_request": "Invalid request parameters",
+  "internal_error": "Internal server error",
+  "missing_env_vars": "Missing required environment variables"
+}

@@ -1,0 +1,7 @@
+{
+  "not_found": "Menu not found",
+  "code_exists": "Menu code already exists",
+  "missing_id": "Missing menu ID",
+  "has_children": "Please delete child menus first",
+  "delete_success": "Deleted successfully"
+}
