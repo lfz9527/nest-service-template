@@ -5,15 +5,17 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus, MSG, CONFIG_DEFAULTS } from '../constant';
+import { HttpStatus, EntityStatus, CONFIG_DEFAULTS } from '../constant';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';
+import { I18nService } from 'nestjs-i18n';
 
 @Injectable()
 export class UserService {
   constructor(
     private prisma: PrismaService,
     private readonly logger: PinoLogger,
+    private i18n: I18nService,
   ) {
     this.logger.setContext(UserService.name);
   }
@@ -61,7 +63,7 @@ export class UserService {
       },
     });
     if (!user) {
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.not_found');
     }
     return user;
   }
@@ -71,7 +73,7 @@ export class UserService {
       where: { username: dto.username, deletedAt: null },
     });
     if (existing) {
-      throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
+      throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.username_exists');
     }
     const passwordHash = await bcrypt.hash(dto.password, CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
     const newUser = await this.prisma.user.create({
@@ -89,16 +91,16 @@ export class UserService {
 
   async updateUser(dto: UpdateUserDto & { id?: number }) {
     const { id, password, ...rest } = dto;
-    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.MISSING_ID);
+    if (!id) throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.missing_id');
 
     const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
-    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.not_found');
 
     if (rest.username && rest.username !== user.username) {
       const existing = await this.prisma.user.findFirst({
         where: { username: rest.username, deletedAt: null },
       });
-      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.USERNAME_EXISTS);
+      if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.username_exists');
     }
 
     const data: Record<string, unknown> = { ...rest };
@@ -116,19 +118,19 @@ export class UserService {
 
   async delUser(id: number) {
     const user = await this.prisma.user.findFirst({ where: { id, deletedAt: null } });
-    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.not_found');
 
     await this.prisma.user.update({
       where: { id },
       data: { deletedAt: new Date(), status: EntityStatus.DISABLED, email: null },
     });
     this.logger.info({ userId: id }, 'User soft-deleted');
-    return { message: MSG.USER.DELETE_SUCCESS };
+    return { message: this.i18n.t('user.delete_success') };
   }
 
   async assignRoles(userId: number, dto: AssignRolesDto) {
     const user = await this.prisma.user.findFirst({ where: { id: userId, deletedAt: null } });
-    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, MSG.USER.NOT_FOUND);
+    if (!user) throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.not_found');
 
     await this.prisma.$transaction(async (tx) => {
       await tx.userRole.deleteMany({ where: { userId } });
@@ -139,6 +141,6 @@ export class UserService {
       }
     });
     this.logger.info({ userId, roleIds: dto.roleIds }, 'Roles assigned');
-    return { message: MSG.USER.ASSIGN_ROLE_SUCCESS };
+    return { message: this.i18n.t('user.assign_role_success') };
   }
 }
