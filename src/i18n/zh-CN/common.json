@@ -1,6 +1,5 @@
 {
   "success": "操作成功",
   "bad_request": "请求参数有误",
-  "internal_error": "服务器内部错误",
-  "missing_env_vars": "缺少必需的环境变量"
+  "internal_error": "服务器内部错误"
 }

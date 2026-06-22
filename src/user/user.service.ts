@@ -15,7 +15,7 @@ export class UserService {
   constructor(
     private prisma: PrismaService,
     private readonly logger: PinoLogger,
-    private i18n: I18nService,
+    private readonly i18n: I18nService,
   ) {
     this.logger.setContext(UserService.name);
   }
