@@ -54,6 +54,17 @@ export type I18nTranslations = {
         "delete_success": string;
         "assign_role_success": string;
     };
+    "validation": {
+        "username_required": string;
+        "password_required": string;
+        "password_min_length": string;
+        "email_invalid": string;
+        "captcha_required": string;
+        "role_name_required": string;
+        "role_code_required": string;
+        "menu_name_required": string;
+        "menu_code_required": string;
+    };
 };
 /* prettier-ignore */
 export type I18nPath = Path<I18nTranslations>;
