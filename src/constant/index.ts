@@ -4,8 +4,6 @@ export { SUCCESS, FAIL, UNAUTHORIZED, FORBIDDEN, TOO_MANY_REQUESTS } from './cod
 export { HttpStatus, EntityStatus } from './code';
 // ── 角色编码 ──
 export { SUPER_ADMIN, USER } from './role-code';
-// ── 中文消息 ──
-export { MSG } from './messages';
 // ── 路由路径 ──
 export { API_PATH } from './paths';
 // ── 权限码 ──
