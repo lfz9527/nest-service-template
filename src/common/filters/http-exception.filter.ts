@@ -2,7 +2,6 @@ import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from
 import { Prisma } from '../../generated/prisma/client';
 import { Response } from 'express';
 import { ApiResponse } from '../response';
-import { FAIL } from '../../constant';
 import { BusinessException } from '../exceptions/business.exception';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nContext, I18nTranslator } from 'nestjs-i18n';
@@ -16,11 +15,6 @@ const PRISMA_CODES = {
   TABLE_NOT_FOUND: 'P2021',
   COLUMN_NOT_FOUND: 'P2022',
 } as const;
-
-/** 翻译参数 */
-interface TArgs {
-  [k: string]: string | number;
-}
 
 /**
  * 全局异常过滤器
