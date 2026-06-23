@@ -4,7 +4,7 @@
 
 ## 项目概览
 
-NestJS 后台管理服务。提供用户/角色/菜单的增删改查，基于 Session 的 RBAC 权限控制，Prisma ORM（MySQL + MariaDB 适配器），Pino 日志。支持中英双语（`Accept-Language` 头切换，nestjs-i18n）。
+NestJS 后台管理服务模板。提供用户/角色/菜单的增删改查，基于 Session 的 RBAC 权限控制，Prisma ORM（MySQL + MariaDB 适配器），Pino 日志（自动生成 Request ID）。内置 CORS、Helmet 安全头、gzip 压缩。支持中英双语（`Accept-Language` 头切换，nestjs-i18n）。
 
 ## 常用命令
 
@@ -24,6 +24,14 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 ```
 
 ## 架构
+
+**启动流程**（`main.ts`）：
+1. 校验必需环境变量 → 缺失则直接 `exit(1)`
+2. 创建 NestJS 实例 → 加载 Helmet（安全头）+ CORS（跨域，credentials 模式）+ Compression（gzip 压缩）
+3. 注册 `I18nValidationPipe`（全局校验 + i18n 错误消息）
+4. 从 `DATABASE_URL` 解析 MySQL 连接参数 → 初始化 Session 存储
+5. 解析端口：生产环境直接使用配置端口；开发环境端口被占用时自动切换下一个可用端口（最多尝试 100 个）
+6. 注册优雅退出钩子（`enableShutdownHooks`），Docker/K8s SIGTERM 时等待当前请求完成
 
 **认证流程**：Express Session 存储在 MySQL 中（express-mysql-session）。`AuthGuard` 检查 `session.userId` —— 不存在则视为未登录。公开接口以 `/public/` 为前缀，在 AuthGuard 中按路径放行。
 
@@ -73,6 +81,8 @@ src/{feature}/
 - `src/common/response.ts` — `ApiResponse` 静态类，`success(data, message)` 和 `fail(message)`。message 无默认值，由 Interceptor 传入翻译后的字符串。
 - `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
+- `src/common/dto/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
+- `src/logger/logger.module.ts` — Pino 日志配置，`genReqId` 使用 `randomUUID()` 为每个请求生成唯一 ID；开发环境 pino-pretty 彩色输出，生产环境双 target（stdout JSON + pino-roll 文件轮转）。
 
 ## 环境配置
 

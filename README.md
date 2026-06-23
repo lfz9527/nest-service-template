@@ -1,6 +1,6 @@
-# Dashboard Service
+# Nest Service Template
 
-NestJS 后台管理服务 — 用户 / 角色 / 菜单 CRUD，基于 Session 的 RBAC 权限控制，支持中英双语。
+NestJS 后台管理服务模板 — 用户 / 角色 / 菜单 CRUD，基于 Session 的 RBAC 权限控制，支持中英双语。内置 CORS、Helmet 安全头、gzip 压缩。
 
 ## 技术栈
 
@@ -10,8 +10,9 @@ NestJS 后台管理服务 — 用户 / 角色 / 菜单 CRUD，基于 Session 的
 | ORM | Prisma 7 + MariaDB 适配器 |
 | 数据库 | MySQL |
 | 认证 | Express Session（MySQL 持久化） |
+| 安全 | Helmet + CORS + gzip 压缩 |
 | 国际化 | nestjs-i18n（i18next），`Accept-Language` 头切换 |
-| 日志 | Pino + pino-pretty（开发）/ pino-roll（生产） |
+| 日志 | Pino + pino-pretty（开发）/ pino-roll（生产），请求级 UUID |
 | 校验 | class-validator + I18nValidationPipe |
 
 ## 快速开始
@@ -29,6 +30,9 @@ npm run db:setup
 
 # 4. 启动开发服务器
 npm run start:dev
+
+# 开发环境下端口被占用时会自动切换到下一个可用端口
+# 生产环境（ npm run start:prod ）固定端口，冲突直接报错
 ```
 
 **默认账号**（种子数据）：
@@ -101,7 +105,7 @@ src/
 ├── i18n/              # 翻译文件（zh-CN + en，按模块拆分 JSON）
 ├── generated/         # 自动生成（Prisma Client + i18n 类型），勿手动编辑
 ├── constant/          # 常量（业务码、EntityStatus、路由路径、权限码、默认值）
-├── common/            # 全局守卫、拦截器、异常过滤器、装饰器
+├── common/            # 全局守卫、拦截器、异常过滤器、装饰器、通用 DTO
 ├── auth/              # 认证模块（登录、验证码、登出）
 ├── user/              # 用户管理
 ├── role/              # 角色管理
