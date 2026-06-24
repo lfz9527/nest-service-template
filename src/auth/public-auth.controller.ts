@@ -43,7 +43,17 @@ export class PublicAuthController {
 
   /** POST /public/auth/login — 用户名+密码+验证码登录，成功后写入 Session */
   @ApiOperation({ summary: '用户登录' })
-  @ApiBody({ type: LoginDto })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        username: { type: 'string', description: '用户名', example: 'admin' },
+        password: { type: 'string', description: '密码', example: 'Abc12345' },
+        captcha: { type: 'string', description: '图形验证码', example: 'a3x9' },
+      },
+      required: ['username', 'password', 'captcha'],
+    },
+  })
   @ApiResponseWrapper(LoginResultDto)
   @ApiResponse({ status: 400, description: '验证码错误或账号密码不匹配' })
   @RateLimit({

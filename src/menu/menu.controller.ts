@@ -34,7 +34,20 @@ export class MenuController {
 
   /** POST /api/menu/addMenu — 创建新菜单节点 */
   @ApiOperation({ summary: '新增菜单' })
-  @ApiBody({ type: CreateMenuDto })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        name: { type: 'string', description: '菜单名称', example: '用户管理' },
+        code: { type: 'string', description: '菜单编码（权限标识）', example: 'user:list' },
+        parentId: { type: 'number', description: '父级菜单ID', example: 0 },
+        path: { type: 'string', description: '前端路由路径', example: '/user/list' },
+        icon: { type: 'string', description: '图标类名', example: 'UserOutlined' },
+        sortOrder: { type: 'number', description: '排序序号', example: 1 },
+      },
+      required: ['name', 'code'],
+    },
+  })
   @ApiResponseWrapper(MenuInfoDto)
   @Post(API_PATH.MENU.ADD)
   addMenu(@Body() dto: CreateMenuDto) {

@@ -1,0 +1,2285 @@
+{
+  "openapi": "3.0.0",
+  "paths": {
+    "/health": {
+      "get": {
+        "operationId": "AppController_health",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "status": {
+                              "type": "string",
+                              "example": "ok"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "健康检查",
+        "tags": [
+          "health"
+        ]
+      }
+    },
+    "/public/auth/getCaptcha": {
+      "get": {
+        "operationId": "PublicAuthController_getCaptcha",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "string",
+                          "description": "SVG 验证码图片",
+                          "example": "<svg>...</svg>"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "获取图形验证码",
+        "tags": [
+          "public/auth"
+        ]
+      }
+    },
+    "/public/auth/login": {
+      "post": {
+        "operationId": "PublicAuthController_login",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/LoginResultDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "验证码错误或账号密码不匹配"
+          }
+        },
+        "summary": "用户登录",
+        "tags": [
+          "public/auth"
+        ]
+      }
+    },
+    "/public/auth/logout": {
+      "post": {
+        "operationId": "PublicAuthController_logout",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          }
+        },
+        "summary": "用户登出",
+        "tags": [
+          "public/auth"
+        ]
+      }
+    },
+    "/api/auth/getUserInfo": {
+      "get": {
+        "operationId": "ApiAuthController_getUserInfo",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取当前用户信息（含权限菜单树）",
+        "tags": [
+          "api/auth"
+        ]
+      }
+    },
+    "/api/user/getUserList": {
+      "get": {
+        "operationId": "UserController_getUserList",
+        "parameters": [
+          {
+            "name": "page",
+            "required": false,
+            "in": "query",
+            "description": "页码",
+            "schema": {
+              "minimum": 1,
+              "default": 1,
+              "example": 1,
+              "type": "number"
+            }
+          },
+          {
+            "name": "pageSize",
+            "required": false,
+            "in": "query",
+            "description": "每页条数",
+            "schema": {
+              "minimum": 1,
+              "default": 10,
+              "example": 10,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "allOf": [
+                            {
+                              "$ref": "#/components/schemas/PaginatedDataDto"
+                            },
+                            {
+                              "properties": {
+                                "list": {
+                                  "type": "array",
+                                  "items": {
+                                    "$ref": "#/components/schemas/UserListItemDto"
+                                  }
+                                }
+                              }
+                            }
+                          ]
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取用户列表",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/user/getUserById": {
+      "get": {
+        "operationId": "UserController_getUserById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "description": "用户ID",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserDetailDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取用户详情（含角色）",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/user/addUser": {
+      "post": {
+        "operationId": "UserController_addUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateUserDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserBriefDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "新增用户",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/user/updateUser": {
+      "post": {
+        "operationId": "UserController_updateUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateUserDto"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "用户ID",
+                        "example": 1
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/UserBriefDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "更新用户",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/user/delUser": {
+      "post": {
+        "operationId": "UserController_delUser",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "用户ID",
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "删除用户（软删除）",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/user/assignRoles": {
+      "post": {
+        "operationId": "UserController_assignRoles",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "userId": {
+                    "type": "number",
+                    "description": "用户ID",
+                    "example": 1
+                  },
+                  "roleIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "description": "角色ID数组",
+                    "example": [
+                      1,
+                      2
+                    ]
+                  }
+                },
+                "required": [
+                  "userId",
+                  "roleIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "为用户分配角色",
+        "tags": [
+          "api/user"
+        ]
+      }
+    },
+    "/api/role/getRoleList": {
+      "get": {
+        "operationId": "RoleController_getRoleList",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/RoleListItemDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取角色列表",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/role/getRoleById": {
+      "get": {
+        "operationId": "RoleController_getRoleById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "description": "角色ID",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/RoleDetailDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取角色详情（含菜单）",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/role/addRole": {
+      "post": {
+        "operationId": "RoleController_addRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateRoleDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/RoleInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "新增角色",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/role/updateRole": {
+      "post": {
+        "operationId": "RoleController_updateRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateRoleDto"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "角色ID",
+                        "example": 1
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/RoleInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "更新角色",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/role/delRole": {
+      "post": {
+        "operationId": "RoleController_delRole",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "角色ID",
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "删除角色",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/role/assignMenus": {
+      "post": {
+        "operationId": "RoleController_assignMenus",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "roleId": {
+                    "type": "number",
+                    "description": "角色ID",
+                    "example": 1
+                  },
+                  "menuIds": {
+                    "type": "array",
+                    "items": {
+                      "type": "number"
+                    },
+                    "description": "菜单ID数组",
+                    "example": [
+                      1,
+                      2,
+                      3
+                    ]
+                  }
+                },
+                "required": [
+                  "roleId",
+                  "menuIds"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "为角色分配菜单",
+        "tags": [
+          "api/role"
+        ]
+      }
+    },
+    "/api/menu/getMenuTree": {
+      "get": {
+        "operationId": "MenuController_getMenuTree",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "array",
+                          "items": {
+                            "$ref": "#/components/schemas/MenuNodeDto"
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取菜单树",
+        "tags": [
+          "api/menu"
+        ]
+      }
+    },
+    "/api/menu/getMenuById": {
+      "get": {
+        "operationId": "MenuController_getMenuById",
+        "parameters": [
+          {
+            "name": "id",
+            "required": true,
+            "in": "query",
+            "description": "菜单ID",
+            "schema": {
+              "example": 1,
+              "type": "number"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/MenuInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "获取菜单详情",
+        "tags": [
+          "api/menu"
+        ]
+      }
+    },
+    "/api/menu/addMenu": {
+      "post": {
+        "operationId": "MenuController_addMenu",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateMenuDto"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/MenuInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "新增菜单",
+        "tags": [
+          "api/menu"
+        ]
+      }
+    },
+    "/api/menu/updateMenu": {
+      "post": {
+        "operationId": "MenuController_updateMenu",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "allOf": [
+                  {
+                    "$ref": "#/components/schemas/UpdateMenuDto"
+                  },
+                  {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "number",
+                        "description": "菜单ID",
+                        "example": 1
+                      }
+                    },
+                    "required": [
+                      "id"
+                    ]
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "$ref": "#/components/schemas/MenuInfoDto"
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "更新菜单",
+        "tags": [
+          "api/menu"
+        ]
+      }
+    },
+    "/api/menu/delMenu": {
+      "post": {
+        "operationId": "MenuController_delMenu",
+        "parameters": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "id": {
+                    "type": "number",
+                    "description": "菜单ID",
+                    "example": 1
+                  }
+                },
+                "required": [
+                  "id"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "成功",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "allOf": [
+                    {
+                      "$ref": "#/components/schemas/ApiResponseWrapperDto"
+                    },
+                    {
+                      "properties": {
+                        "data": {
+                          "type": "object",
+                          "properties": {
+                            "message": {
+                              "type": "string",
+                              "description": "操作结果消息"
+                            }
+                          }
+                        }
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "请求参数错误或业务校验失败"
+          },
+          "401": {
+            "description": "未登录"
+          },
+          "403": {
+            "description": "权限不足"
+          }
+        },
+        "summary": "删除菜单",
+        "tags": [
+          "api/menu"
+        ]
+      }
+    }
+  },
+  "info": {
+    "title": "后台管理服务",
+    "description": "",
+    "version": "1.0",
+    "contact": {}
+  },
+  "tags": [],
+  "servers": [],
+  "components": {
+    "securitySchemes": {
+      "cookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "connect.sid"
+      }
+    },
+    "schemas": {
+      "ApiResponseWrapperDto": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "number",
+            "description": "业务状态码，0=成功",
+            "example": 0
+          },
+          "message": {
+            "type": "string",
+            "description": "提示消息",
+            "example": "操作成功"
+          },
+          "success": {
+            "type": "boolean",
+            "description": "是否成功",
+            "example": true
+          },
+          "data": {
+            "type": "object",
+            "description": "业务数据"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "success",
+          "data"
+        ]
+      },
+      "LoginResultDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          }
+        },
+        "required": [
+          "userId",
+          "username"
+        ]
+      },
+      "LoginDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码",
+            "example": "Abc12345"
+          },
+          "captcha": {
+            "type": "string",
+            "description": "图形验证码",
+            "example": "a3x9"
+          }
+        },
+        "required": [
+          "username",
+          "password",
+          "captcha"
+        ]
+      },
+      "MenuNodeDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "权限码",
+            "example": "user:list"
+          },
+          "parentId": {
+            "type": "object",
+            "description": "父级菜单ID",
+            "example": null
+          },
+          "path": {
+            "type": "object",
+            "description": "前端路由路径",
+            "example": "/user"
+          },
+          "icon": {
+            "type": "object",
+            "description": "图标",
+            "example": "UserOutlined"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "排序号",
+            "example": 1
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          },
+          "children": {
+            "description": "子菜单",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuNodeDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "sortOrder",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UserInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "admin"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "admin@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "menus": {
+            "description": "菜单/权限树",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MenuNodeDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "menus"
+        ]
+      },
+      "PaginatedDataDto": {
+        "type": "object",
+        "properties": {
+          "list": {
+            "description": "数据列表",
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "total": {
+            "type": "number",
+            "description": "总条数",
+            "example": 100
+          },
+          "page": {
+            "type": "number",
+            "description": "当前页码",
+            "example": 1
+          },
+          "pageSize": {
+            "type": "number",
+            "description": "每页条数",
+            "example": 10
+          }
+        },
+        "required": [
+          "list",
+          "total",
+          "page",
+          "pageSize"
+        ]
+      },
+      "UserListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "test@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "RoleDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "超级管理员"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码",
+            "example": "super_admin"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "拥有所有权限"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "UserRoleJoinDto": {
+        "type": "object",
+        "properties": {
+          "userId": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "roleId": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 2
+          },
+          "role": {
+            "description": "角色详情",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/RoleDataDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "userId",
+          "roleId",
+          "role"
+        ]
+      },
+      "UserDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "test@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          },
+          "userRoles": {
+            "description": "关联角色列表（含连接表字段）",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/UserRoleJoinDto"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "userRoles"
+        ]
+      },
+      "UserBriefDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "用户ID",
+            "example": 1
+          },
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "test@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态（addUser 不返回此字段）",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          }
+        },
+        "required": [
+          "id",
+          "username"
+        ]
+      },
+      "CreateUserDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "password": {
+            "type": "string",
+            "description": "密码（明文，服务端 bcrypt 哈希后入库）",
+            "example": "Abc12345"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "test@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13800138000"
+          }
+        },
+        "required": [
+          "username",
+          "password"
+        ]
+      },
+      "UpdateUserDto": {
+        "type": "object",
+        "properties": {
+          "username": {
+            "type": "string",
+            "description": "用户名",
+            "example": "zhangsan"
+          },
+          "password": {
+            "type": "string",
+            "description": "新密码（非空时触发密码重哈希）",
+            "example": "NewPass123"
+          },
+          "email": {
+            "type": "string",
+            "description": "邮箱",
+            "example": "newemail@example.com"
+          },
+          "phone": {
+            "type": "string",
+            "description": "手机号",
+            "example": "13900139000"
+          },
+          "status": {
+            "type": "number",
+            "description": "用户状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          }
+        }
+      },
+      "MenuBriefDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "权限码",
+            "example": "user:list"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code"
+        ]
+      },
+      "RoleMenuBriefJoinDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "menuId": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 2
+          },
+          "menu": {
+            "description": "菜单详情",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MenuBriefDataDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "roleId",
+          "menuId",
+          "menu"
+        ]
+      },
+      "RoleListItemDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "超级管理员"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码",
+            "example": "super_admin"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "拥有所有权限"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "roleMenus": {
+            "description": "关联菜单（含连接表字段）",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleMenuBriefJoinDto"
+            }
+          },
+          "_count": {
+            "type": "object",
+            "description": "用户数量统计",
+            "example": {
+              "userRoles": 2
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status",
+          "createdAt",
+          "roleMenus",
+          "_count"
+        ]
+      },
+      "MenuDataDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "权限码",
+            "example": "user:list"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code"
+        ]
+      },
+      "RoleMenuJoinDto": {
+        "type": "object",
+        "properties": {
+          "roleId": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "menuId": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 2
+          },
+          "menu": {
+            "description": "菜单详情",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/MenuDataDto"
+              }
+            ]
+          }
+        },
+        "required": [
+          "roleId",
+          "menuId",
+          "menu"
+        ]
+      },
+      "RoleDetailDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "超级管理员"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码",
+            "example": "super_admin"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "拥有所有权限"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          },
+          "roleMenus": {
+            "description": "关联菜单（含连接表字段）",
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoleMenuJoinDto"
+            }
+          },
+          "_count": {
+            "type": "object",
+            "description": "用户数量统计",
+            "example": {
+              "userRoles": 2
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status",
+          "createdAt",
+          "updatedAt",
+          "roleMenus",
+          "_count"
+        ]
+      },
+      "RoleInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "角色ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "运营"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码",
+            "example": "operator"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "日常运营权限"
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "运营"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码（唯一标识）",
+            "example": "operator"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "日常运营权限"
+          }
+        },
+        "required": [
+          "name",
+          "code"
+        ]
+      },
+      "UpdateRoleDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "角色名称",
+            "example": "运营"
+          },
+          "code": {
+            "type": "string",
+            "description": "角色编码",
+            "example": "operator"
+          },
+          "description": {
+            "type": "string",
+            "description": "角色描述",
+            "example": "日常运营权限"
+          },
+          "status": {
+            "type": "number",
+            "description": "角色状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          }
+        }
+      },
+      "MenuInfoDto": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "number",
+            "description": "菜单ID",
+            "example": 1
+          },
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "权限码",
+            "example": "user:list"
+          },
+          "parentId": {
+            "type": "object",
+            "description": "父级菜单ID",
+            "example": null
+          },
+          "path": {
+            "type": "object",
+            "description": "前端路由路径",
+            "example": "/user"
+          },
+          "icon": {
+            "type": "object",
+            "description": "图标",
+            "example": "UserOutlined"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "排序号",
+            "example": 1
+          },
+          "status": {
+            "type": "number",
+            "description": "状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          },
+          "createdAt": {
+            "type": "string",
+            "description": "创建时间",
+            "example": "2026-01-01T00:00:00.000Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "description": "更新时间",
+            "example": "2026-06-24T12:00:00.000Z"
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "code",
+          "sortOrder",
+          "status",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "CreateMenuDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "菜单编码（权限标识）",
+            "example": "user:list"
+          },
+          "parentId": {
+            "type": "number",
+            "description": "父级菜单ID（用于构建树形结构）",
+            "example": null
+          },
+          "path": {
+            "type": "string",
+            "description": "前端路由路径",
+            "example": "/user/list"
+          },
+          "icon": {
+            "type": "string",
+            "description": "图标类名",
+            "example": "UserOutlined"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "排序序号（值越小越靠前）",
+            "example": 1
+          }
+        },
+        "required": [
+          "name",
+          "code"
+        ]
+      },
+      "UpdateMenuDto": {
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "菜单名称",
+            "example": "用户管理"
+          },
+          "code": {
+            "type": "string",
+            "description": "菜单编码",
+            "example": "user:list"
+          },
+          "parentId": {
+            "type": "number",
+            "description": "父级菜单ID",
+            "example": null
+          },
+          "path": {
+            "type": "string",
+            "description": "前端路由路径",
+            "example": "/user/list"
+          },
+          "icon": {
+            "type": "string",
+            "description": "图标类名",
+            "example": "UserOutlined"
+          },
+          "sortOrder": {
+            "type": "number",
+            "description": "排序序号",
+            "example": 1
+          },
+          "status": {
+            "type": "number",
+            "description": "菜单状态",
+            "enum": [
+              0,
+              1
+            ],
+            "example": 1
+          }
+        }
+      }
+    }
+  }
+}
