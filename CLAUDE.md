@@ -104,7 +104,20 @@ src/{feature}/
 - `src/common/dto/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
 - `src/common/swagger/response-wrapper.ts` — 统一响应包装装饰器（`ApiResponseWrapper`、`ApiPaginatedResponse`、`ApiArrayResponse`、`ApiMessageResponse`、`ApiHealthResponse`、`ApiCommonErrorResponses`）。
 - `scripts/dump-swagger.ts` — 导出 OpenAPI JSON 到 `openapi-dump.json`，用于 Apifox 等工具导入。
+- `scripts/check-doc-update.sh` — `Stop` + `PostToolUse` hook 脚本，检测源码变更并注入 CLAUDE.md 更新提醒。
+- `.claude/settings.local.json` — 项目级本地设置（权限、hooks），不提交到仓库。
 - `src/logger/logger.module.ts` — Pino 日志配置，`genReqId` 使用 `randomUUID()` 为每个请求生成唯一 ID；开发环境 pino-pretty 彩色输出，生产环境双 target（stdout JSON + pino-roll 文件轮转）。
+
+## Claude Code Hooks
+
+配置在 `.claude/settings.local.json`，自动检测源码变更并提醒更新本文档：
+
+| Hook | 事件 | 触发时机 |
+|------|------|---------|
+| `PostToolUse` | `Bash(git commit *)` | `git commit` 执行后立即注入提醒 |
+| `Stop` | — | 会话结束时兜底检测 |
+
+检测逻辑（`scripts/check-doc-update.sh`）：检查未提交变更 + 最近一次 commit，只要涉及 `.ts`/`.json`/`.prisma`/`.md` 源文件即输出 `additionalContext` 注入到下次会话。
 
 ## 环境配置
 
