@@ -14,6 +14,7 @@ NestJS 后台管理服务模板 — 用户 / 角色 / 菜单 CRUD，基于 Sessi
 | 国际化 | nestjs-i18n（i18next），`Accept-Language` 头切换 |
 | 日志 | Pino + pino-pretty（开发）/ pino-roll（生产），请求级 UUID |
 | 校验 | class-validator + I18nValidationPipe |
+| 文档 | Swagger / OpenAPI 3.0（`@nestjs/swagger`） |
 
 ## 快速开始
 
@@ -59,30 +60,32 @@ curl http://localhost:3000/api/user/list \
 
 ## 接口概览
 
-| 路径 | 登录 | 说明 |
-|------|------|------|
-| `GET /health` | — | 健康检查 |
-| `GET /public/auth/getCaptcha` | — | 获取图形验证码 |
-| `POST /public/auth/login` | — | 登录 |
-| `POST /public/auth/logout` | — | 登出 |
-| `GET /api/auth/getUserInfo` | 是 | 当前用户信息和菜单 |
-| `GET /api/user/list` | 是 | 用户列表（分页） |
-| `GET /api/user/get` | 是 | 用户详情 |
-| `POST /api/user/add` | 是 | 新增用户 |
-| `POST /api/user/update` | 是 | 更新用户 |
-| `POST /api/user/delete` | 是 | 删除用户（软删除） |
-| `POST /api/user/assignRoles` | 是 | 分配角色 |
-| `GET /api/role/list` | 是 | 角色列表 |
-| `GET /api/role/get` | 是 | 角色详情 |
-| `POST /api/role/add` | 是 | 新增角色 |
-| `POST /api/role/update` | 是 | 更新角色 |
-| `POST /api/role/delete` | 是 | 删除角色 |
-| `POST /api/role/assignMenus` | 是 | 分配菜单 |
-| `GET /api/menu/tree` | 是 | 菜单树 |
-| `GET /api/menu/get` | 是 | 菜单详情 |
-| `POST /api/menu/add` | 是 | 新增菜单 |
-| `POST /api/menu/update` | 是 | 更新菜单 |
-| `POST /api/menu/delete` | 是 | 删除菜单 |
+| 路径 | 方法 | 登录 | 说明 |
+|------|------|------|------|
+| `/health` | GET | — | 健康检查 |
+| `/public/auth/getCaptcha` | GET | — | 获取图形验证码 |
+| `/public/auth/login` | POST | — | 登录 |
+| `/public/auth/logout` | POST | — | 登出 |
+| `/api/auth/getUserInfo` | GET | 是 | 当前用户信息和权限菜单 |
+| `/api/user/getUserList` | GET | 是 | 用户列表（分页） |
+| `/api/user/getUserById` | GET | 是 | 用户详情（含角色） |
+| `/api/user/addUser` | POST | 是 | 新增用户 |
+| `/api/user/updateUser` | POST | 是 | 更新用户 |
+| `/api/user/delUser` | POST | 是 | 删除用户（软删除） |
+| `/api/user/assignRoles` | POST | 是 | 为用户分配角色 |
+| `/api/role/getRoleList` | GET | 是 | 角色列表 |
+| `/api/role/getRoleById` | GET | 是 | 角色详情（含菜单） |
+| `/api/role/addRole` | POST | 是 | 新增角色 |
+| `/api/role/updateRole` | POST | 是 | 更新角色 |
+| `/api/role/delRole` | POST | 是 | 删除角色 |
+| `/api/role/assignMenus` | POST | 是 | 为角色分配菜单 |
+| `/api/menu/getMenuTree` | GET | 是 | 菜单树 |
+| `/api/menu/getMenuById` | GET | 是 | 菜单详情 |
+| `/api/menu/addMenu` | POST | 是 | 新增菜单 |
+| `/api/menu/updateMenu` | POST | 是 | 更新菜单 |
+| `/api/menu/delMenu` | POST | 是 | 删除菜单 |
+
+> Swagger 文档：开发环境访问 `http://localhost:{port}/api-docs`，JSON 导出用 `npm run build && npx ts-node scripts/dump-swagger.ts`。
 
 ## 统一响应格式
 
@@ -112,6 +115,9 @@ src/
 ├── menu/              # 菜单管理
 ├── prisma/            # PrismaService 封装
 └── logger/            # 日志模块配置
+scripts/
+├── dump-swagger.ts    # 导出 OpenAPI JSON
+└── check-doc-update.sh # Claude Code hook 脚本
 ```
 
 ## 常用命令
