@@ -1,24 +1,24 @@
-import { Controller, Get, Post, Body, Session, Req } from '@nestjs/common';
-import { Request } from 'express';
+import { Controller, Get, Post, Body, Session } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
+import { LoginResultDto } from './dto/login-result.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
 import { API_PATH, CONFIG_DEFAULTS } from '../constant';
+import { ApiResponseWrapper, ApiMessageResponse } from '../common/swagger';
 import { I18nService } from 'nestjs-i18n';
 
-/**
- * 认证控制器
- * 处理登录、登出、验证码获取和用户信息查询等认证相关的 HTTP 请求
- */
-@Controller()
-export class AuthController {
+@ApiTags('public/auth')
+@Controller('public/auth')
+export class PublicAuthController {
   constructor(
     private authService: AuthService,
     private i18n: I18nService,
   ) {}
 
-  /** GET /public/auth/getCaptcha */
+  @ApiOperation({ summary: '获取图形验证码' })
+  @ApiResponse({ status: 200, description: 'SVG 验证码图片', schema: { type: 'string' } })
   @RateLimit({
     windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_WINDOW_SECONDS,
     max: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_MAX,
@@ -29,7 +29,8 @@ export class AuthController {
     return svg;
   }
 
-  /** POST /public/auth/login */
+  @ApiOperation({ summary: '用户登录' })
+  @ApiResponseWrapper(LoginResultDto)
   @RateLimit({
     windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_WINDOW_SECONDS,
     max: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_MAX,
@@ -39,17 +40,11 @@ export class AuthController {
     return this.authService.login(dto, session);
   }
 
-  /** POST /public/auth/logout */
+  @ApiOperation({ summary: '用户登出' })
+  @ApiMessageResponse()
   @Post(API_PATH.AUTH.LOGOUT)
   logout(@Session() session: AppSession) {
     this.authService.logout(session);
     return { message: this.i18n.t('auth.logout_success') };
-  }
-
-  /** GET /api/auth/getUserInfo */
-  @Get(API_PATH.AUTH.USER_INFO)
-  async getUserInfo(@Req() req: Request) {
-    const session = req.session as AppSession;
-    return this.authService.getUserInfo(session.userId!);
   }
 }
