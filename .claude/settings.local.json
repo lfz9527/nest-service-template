@@ -8,5 +8,18 @@
       "Bash(npm install *)"
     ],
     "defaultMode": "bypassPermissions"
+  },
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/check-doc-update.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
   }
 }
