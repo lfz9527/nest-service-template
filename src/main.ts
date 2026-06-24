@@ -5,18 +5,14 @@ import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
 import helmet from 'helmet';
 import compression from 'compression';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import net from 'net';
 import { CONFIG_DEFAULTS } from './constant';
 
 /**
  * 必须存在的环境变量列表，缺失时启动报错
  */
-const REQUIRED_ENV_VARS = [
-  'DATABASE_URL',
-  'SESSION_SECRET',
-  'SESSION_MAX_AGE',
-  'PORT',
-] as const;
+const REQUIRED_ENV_VARS = ['DATABASE_URL', 'SESSION_SECRET', 'SESSION_MAX_AGE', 'PORT'] as const;
 
 /**
  * 启动时校验必需环境变量
@@ -82,6 +78,26 @@ async function bootstrap() {
   validateEnv();
 
   const app = await NestFactory.create(AppModule);
+
+  // ── Swagger 接口文档（生产环境默认禁用，SWAGGER_ENABLED=true 开启） ──
+  if (process.env.NODE_ENV !== 'production' || process.env.SWAGGER_ENABLED === 'true') {
+    const swaggerConfig = new DocumentBuilder()
+      .setTitle('后台管理服务')
+      .setDescription(
+        '用户/角色/菜单管理 API\n\n' +
+          '## 认证\n' +
+          '本系统使用 Session Cookie 认证。\n' +
+          '1. 点击右上角 **Authorize** 按钮\n' +
+          '2. 先调用 `POST /public/auth/login` 获取 Session\n' +
+          '3. 之后即可调用所有 `/api/*` 接口',
+      )
+      .setVersion('1.0')
+      .addCookieAuth('connect.sid')
+      .build();
+
+    const document = SwaggerModule.createDocument(app, swaggerConfig);
+    SwaggerModule.setup('api-docs', app, document);
+  }
 
   // 安全头 —— 防 XSS、点击劫持、MIME 嗅探等
   app.use(helmet());
