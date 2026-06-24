@@ -66,7 +66,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message,
       );
 
-      response.status(httpCode).json({
+      response.status(200).json({
         ...ApiResponse.fail(message),
         code: exception.businessCode,
       });
@@ -83,7 +83,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
     );
 
-    response.status(httpCode).json(ApiResponse.fail(message));
+    response.status(200).json(ApiResponse.fail(message));
   }
 
   private handlePrismaError(
@@ -104,7 +104,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
     );
 
-    response.status(HttpStatus.BAD_REQUEST).json(ApiResponse.fail(message));
+    response.status(200).json(ApiResponse.fail(message));
   }
 
   private handlePrismaValidationError(
@@ -118,7 +118,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     );
 
     response
-      .status(HttpStatus.BAD_REQUEST)
+      .status(200)
       .json(ApiResponse.fail(this.t('common.bad_request') || 'common.bad_request'));
   }
 
