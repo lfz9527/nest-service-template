@@ -17,7 +17,7 @@ export class MenuController {
   constructor(private menuService: MenuService) {}
 
   /** GET /api/menu/getMenuTree — 获取完整菜单树 */
-  @ApiOperation({ summary: '获取菜单树', description: '需权限: menu:list' })
+  @ApiOperation({ summary: '获取菜单树' })
   @ApiArrayResponse(MenuNodeDto)
   @Permissions(PERM.MENU.LIST)
   @Get(API_PATH.MENU.TREE)
@@ -26,7 +26,7 @@ export class MenuController {
   }
 
   /** GET /api/menu/getMenuById — 按 ID 查询单个菜单 */
-  @ApiOperation({ summary: '获取菜单详情', description: '需权限: menu:list' })
+  @ApiOperation({ summary: '获取菜单详情' })
   @ApiResponseWrapper(MenuInfoDto)
   @Permissions(PERM.MENU.LIST)
   @Get(API_PATH.MENU.BY_ID)
@@ -35,7 +35,7 @@ export class MenuController {
   }
 
   /** POST /api/menu/addMenu — 创建新菜单节点 */
-  @ApiOperation({ summary: '新增菜单', description: '需权限: menu:add' })
+  @ApiOperation({ summary: '新增菜单' })
   @ApiResponseWrapper(MenuInfoDto)
   @Permissions(PERM.MENU.ADD)
   @Post(API_PATH.MENU.ADD)
@@ -44,7 +44,7 @@ export class MenuController {
   }
 
   /** POST /api/menu/updateMenu — 更新菜单信息 */
-  @ApiOperation({ summary: '更新菜单', description: '需权限: menu:update' })
+  @ApiOperation({ summary: '更新菜单' })
   @ApiResponseWrapper(MenuInfoDto)
   @Permissions(PERM.MENU.UPDATE)
   @Post(API_PATH.MENU.UPDATE)
@@ -53,7 +53,7 @@ export class MenuController {
   }
 
   /** POST /api/menu/delMenu — 删除菜单（有子菜单时禁止） */
-  @ApiOperation({ summary: '删除菜单', description: '需权限: menu:delete（有子菜单时禁止删除）' })
+  @ApiOperation({ summary: '删除菜单' })
   @ApiMessageResponse()
   @Permissions(PERM.MENU.DELETE)
   @Post(API_PATH.MENU.DELETE)

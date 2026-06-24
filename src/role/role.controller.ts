@@ -19,7 +19,7 @@ export class RoleController {
   constructor(private roleService: RoleService) {}
 
   /** GET /api/role/getRoleList — 获取全部角色（含关联菜单及用户统计） */
-  @ApiOperation({ summary: '获取角色列表', description: '需权限: role:list' })
+  @ApiOperation({ summary: '获取角色列表' })
   @ApiArrayResponse(RoleListItemDto)
   @Permissions(PERM.ROLE.LIST)
   @Get(API_PATH.ROLE.LIST)
@@ -28,7 +28,7 @@ export class RoleController {
   }
 
   /** GET /api/role/getRoleById — 按 ID 查询角色详情 */
-  @ApiOperation({ summary: '获取角色详情（含菜单）', description: '需权限: role:list' })
+  @ApiOperation({ summary: '获取角色详情（含菜单）' })
   @ApiResponseWrapper(RoleDetailDto)
   @Permissions(PERM.ROLE.LIST)
   @Get(API_PATH.ROLE.BY_ID)
@@ -37,7 +37,7 @@ export class RoleController {
   }
 
   /** POST /api/role/addRole — 创建新角色 */
-  @ApiOperation({ summary: '新增角色', description: '需权限: role:add' })
+  @ApiOperation({ summary: '新增角色' })
   @ApiResponseWrapper(RoleInfoDto)
   @Permissions(PERM.ROLE.ADD)
   @Post(API_PATH.ROLE.ADD)
@@ -46,7 +46,7 @@ export class RoleController {
   }
 
   /** POST /api/role/updateRole — 更新角色信息 */
-  @ApiOperation({ summary: '更新角色', description: '需权限: role:update' })
+  @ApiOperation({ summary: '更新角色' })
   @ApiResponseWrapper(RoleInfoDto)
   @Permissions(PERM.ROLE.UPDATE)
   @Post(API_PATH.ROLE.UPDATE)
@@ -55,7 +55,7 @@ export class RoleController {
   }
 
   /** POST /api/role/delRole — 物理删除角色及其关联 */
-  @ApiOperation({ summary: '删除角色', description: '需权限: role:delete' })
+  @ApiOperation({ summary: '删除角色' })
   @ApiMessageResponse()
   @Permissions(PERM.ROLE.DELETE)
   @Post(API_PATH.ROLE.DELETE)
@@ -64,7 +64,7 @@ export class RoleController {
   }
 
   /** POST /api/role/assignMenus — 全量覆盖角色菜单 */
-  @ApiOperation({ summary: '为角色分配菜单', description: '需权限: role:assignMenu' })
+  @ApiOperation({ summary: '为角色分配菜单' })
   @ApiMessageResponse()
   @Permissions(PERM.ROLE.ASSIGN_MENU)
   @Post(API_PATH.ROLE.ASSIGN_MENUS)
