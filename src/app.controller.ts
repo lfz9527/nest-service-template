@@ -1,15 +1,11 @@
 import { Controller, Get } from '@nestjs/common';
+import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
 
-/**
- * 应用根控制器
- * 提供基础的运行状态检查端点。
- */
+@ApiTags('health')
 @Controller()
 export class AppController {
-  /**
-   * 健康检查接口
-   * GET /health —— 返回简单 JSON 表示服务运行正常。
-   */
+  @ApiOperation({ summary: '健康检查' })
+  @ApiResponse({ status: 200, description: '服务正常', schema: { example: { status: 'ok' } } })
   @Get('health')
   health() {
     return { status: 'ok' };
