@@ -1,18 +1,21 @@
 import { Type, applyDecorators } from '@nestjs/common';
-import { ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiExtraModels, ApiProperty, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 
 /**
  * 统一响应包装的 OpenAPI Schema
  * 对应 ApiResponse.success() 生成的 { code, message, success, data } 结构
  */
 export class ApiResponseWrapperDto {
-  /** 业务状态码，0=成功 */
+  @ApiProperty({ description: '业务状态码，0=成功', example: 0 })
   code: number;
-  /** 提示消息 */
+
+  @ApiProperty({ description: '提示消息', example: '操作成功' })
   message: string;
-  /** 是否成功 */
+
+  @ApiProperty({ description: '是否成功', example: true })
   success: boolean;
-  /** 业务数据 */
+
+  @ApiProperty({ description: '业务数据' })
   data: unknown;
 }
 
@@ -20,13 +23,16 @@ export class ApiResponseWrapperDto {
  * 分页列表数据结构（与 ListResult 对应）
  */
 export class PaginatedDataDto<T> {
-  /** 数据列表 */
+  @ApiProperty({ description: '数据列表' })
   list: T[];
-  /** 总条数 */
+
+  @ApiProperty({ description: '总条数', example: 100 })
   total: number;
-  /** 当前页码 */
+
+  @ApiProperty({ description: '当前页码', example: 1 })
   page: number;
-  /** 每页条数 */
+
+  @ApiProperty({ description: '每页条数', example: 10 })
   pageSize: number;
 }
 

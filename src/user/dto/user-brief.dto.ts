@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
+import { EntityStatus } from '../../constant';
 
 export class UserBriefDto {
   @ApiProperty({ description: '用户ID', example: 1 })
@@ -12,4 +13,7 @@ export class UserBriefDto {
 
   @ApiProperty({ description: '手机号', required: false, example: '13800138000' })
   phone?: string;
+
+  @ApiProperty({ description: '状态', enum: EntityStatus, example: EntityStatus.ENABLED })
+  status: number;
 }

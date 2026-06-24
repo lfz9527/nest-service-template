@@ -1,7 +1,8 @@
 import { ApiProperty } from '@nestjs/swagger';
 import { EntityStatus } from '../../constant';
 
-class RoleMenuBriefDto {
+/** Prisma include 返回的 menu 实体（简要） */
+class MenuBriefDataDto {
   @ApiProperty({ description: '菜单ID', example: 1 })
   id: number;
 
@@ -10,6 +11,18 @@ class RoleMenuBriefDto {
 
   @ApiProperty({ description: '权限码', example: 'user:list' })
   code: string;
+}
+
+/** Prisma RoleMenu 连接表 + include menu */
+class RoleMenuBriefJoinDto {
+  @ApiProperty({ description: '角色ID', example: 1 })
+  roleId: number;
+
+  @ApiProperty({ description: '菜单ID', example: 2 })
+  menuId: number;
+
+  @ApiProperty({ description: '菜单详情' })
+  menu: MenuBriefDataDto;
 }
 
 export class RoleListItemDto {
@@ -31,8 +44,8 @@ export class RoleListItemDto {
   @ApiProperty({ description: '创建时间', example: '2026-01-01T00:00:00.000Z' })
   createdAt: string;
 
-  @ApiProperty({ description: '关联菜单', type: [RoleMenuBriefDto] })
-  roleMenus: RoleMenuBriefDto[];
+  @ApiProperty({ description: '关联菜单（含连接表字段）', type: [RoleMenuBriefJoinDto] })
+  roleMenus: RoleMenuBriefJoinDto[];
 
   @ApiProperty({ description: '用户数量统计', example: { userRoles: 2 } })
   _count: { userRoles: number };

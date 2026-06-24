@@ -29,6 +29,9 @@ export class MenuNodeDto {
   @ApiProperty({ description: '创建时间', example: '2026-01-01T00:00:00.000Z' })
   createdAt: string;
 
+  @ApiProperty({ description: '更新时间', example: '2026-06-24T12:00:00.000Z' })
+  updatedAt: string;
+
   @ApiProperty({ description: '子菜单', type: [MenuNodeDto], required: false })
   children?: MenuNodeDto[];
 }

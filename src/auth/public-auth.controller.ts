@@ -1,12 +1,12 @@
 import { Controller, Get, Post, Body, Session } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResultDto } from './dto/login-result.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
 import { API_PATH, CONFIG_DEFAULTS } from '../constant';
-import { ApiResponseWrapper, ApiMessageResponse } from '../common/swagger';
+import { ApiResponseWrapper, ApiMessageResponse, ApiResponseWrapperDto } from '../common/swagger';
 import { I18nService } from 'nestjs-i18n';
 
 @ApiTags('public/auth')
@@ -18,7 +18,17 @@ export class PublicAuthController {
   ) {}
 
   @ApiOperation({ summary: '获取图形验证码' })
-  @ApiResponse({ status: 200, description: 'SVG 验证码图片', schema: { type: 'string' } })
+  @ApiExtraModels(ApiResponseWrapperDto)
+  @ApiResponse({
+    status: 200,
+    description: '成功',
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(ApiResponseWrapperDto) },
+        { properties: { data: { type: 'string', description: 'SVG 验证码图片', example: '<svg>...</svg>' } } },
+      ],
+    },
+  })
   @RateLimit({
     windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_WINDOW_SECONDS,
     max: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_MAX,
