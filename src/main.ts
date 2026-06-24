@@ -5,7 +5,7 @@ import session from 'express-session';
 import createMySQLStore from 'express-mysql-session';
 import helmet from 'helmet';
 import compression from 'compression';
-import { SwaggerModule, DocumentBuilder, type OpenAPIObject } from '@nestjs/swagger';
+import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import net from 'net';
 import { CONFIG_DEFAULTS } from './constant';
 
@@ -70,25 +70,26 @@ async function resolvePort(startPort: number): Promise<number> {
 }
 
 /**
- * 构建swagger接口站点 
+ * 构建 Swagger 文档配置
+ * 开发环境始终开启，生产环境需 SWAGGER_ENABLED=true
  */
-function buildSwaggerConfig(): Omit<OpenAPIObject, "paths"> | null {
-  if (process.env.SWAGGER_ENABLED !== 'true') return null
-  const swaggerConfig = new DocumentBuilder()
+function buildSwaggerConfig() {
+  const isProduction = process.env.NODE_ENV === 'production';
+  if (isProduction && process.env.SWAGGER_ENABLED !== 'true') return null;
+
+  return new DocumentBuilder()
     .setTitle('后台管理服务')
     .setDescription(
       '用户/角色/菜单管理 API\n\n' +
-      '## 认证\n' +
-      '本系统使用 Session Cookie 认证。\n' +
-      '1. 点击右上角 **Authorize** 按钮\n' +
-      '2. 先调用 `POST /public/auth/login` 获取 Session\n' +
-      '3. 之后即可调用所有 `/api/*` 接口',
+        '## 认证\n' +
+        '本系统使用 Session Cookie 认证。\n' +
+        '1. 点击右上角 **Authorize** 按钮\n' +
+        '2. 先调用 `POST /public/auth/login` 获取 Session\n' +
+        '3. 之后即可调用所有 `/api/*` 接口',
     )
     .setVersion('1.0')
     .addCookieAuth('connect.sid')
     .build();
-  return swaggerConfig
-
 }
 
 /**
