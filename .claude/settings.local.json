@@ -10,6 +10,19 @@
     "defaultMode": "bypassPermissions"
   },
   "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash scripts/check-doc-update.sh",
+            "if": "Bash(git commit *)",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
     "Stop": [
       {
         "hooks": [
