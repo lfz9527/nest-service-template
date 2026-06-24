@@ -176,3 +176,53 @@ export function ApiMessageResponse() {
     }),
   );
 }
+
+/**
+ * 健康检查端点专用响应装饰器
+ *
+ * @example
+ * @ApiHealthResponse()
+ * @Get('health')
+ * health() { ... }
+ */
+export function ApiHealthResponse() {
+  return applyDecorators(
+    ApiExtraModels(ApiResponseWrapperDto),
+    ApiResponse({
+      status: 200,
+      description: '成功',
+      schema: {
+        allOf: [
+          { $ref: getSchemaPath(ApiResponseWrapperDto) },
+          {
+            properties: {
+              data: {
+                type: 'object',
+                properties: {
+                  status: { type: 'string', example: 'ok' },
+                },
+              },
+            },
+          },
+        ],
+      },
+    }),
+  );
+}
+
+/**
+ * 标注常见错误响应（400/401/403）
+ * 适用于所有需要登录 + 权限校验的控制器
+ *
+ * @example
+ * @ApiCommonErrorResponses()
+ * @Controller('api/user')
+ * export class UserController { ... }
+ */
+export function ApiCommonErrorResponses() {
+  return applyDecorators(
+    ApiResponse({ status: 400, description: '请求参数错误或业务校验失败' }),
+    ApiResponse({ status: 401, description: '未登录' }),
+    ApiResponse({ status: 403, description: '权限不足' }),
+  );
+}

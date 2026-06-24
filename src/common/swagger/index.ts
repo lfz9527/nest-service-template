@@ -5,4 +5,6 @@ export {
   ApiPaginatedResponse,
   ApiArrayResponse,
   ApiMessageResponse,
+  ApiHealthResponse,
+  ApiCommonErrorResponses,
 } from './response-wrapper';

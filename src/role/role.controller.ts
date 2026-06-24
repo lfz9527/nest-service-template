@@ -9,13 +9,16 @@ import { RoleDetailDto } from './dto/role-detail.dto';
 import { RoleInfoDto } from './dto/role-info.dto';
 import { Permissions } from '../common/decorators/permissions.decorator';
 import { API_PATH, PERM } from '../constant';
-import { ApiResponseWrapper, ApiArrayResponse, ApiMessageResponse } from '../common/swagger';
+import { ApiResponseWrapper, ApiArrayResponse, ApiMessageResponse, ApiCommonErrorResponses } from '../common/swagger';
 
+/** 角色管理控制器 — 提供角色的增删改查及菜单分配 */
 @ApiTags('api/role')
+@ApiCommonErrorResponses()
 @Controller('api/role')
 export class RoleController {
   constructor(private roleService: RoleService) {}
 
+  /** GET /api/role/getRoleList — 获取全部角色（含关联菜单及用户统计） */
   @ApiOperation({ summary: '获取角色列表', description: '需权限: role:list' })
   @ApiArrayResponse(RoleListItemDto)
   @Permissions(PERM.ROLE.LIST)
@@ -24,6 +27,7 @@ export class RoleController {
     return this.roleService.getRoleList();
   }
 
+  /** GET /api/role/getRoleById — 按 ID 查询角色详情 */
   @ApiOperation({ summary: '获取角色详情（含菜单）', description: '需权限: role:list' })
   @ApiResponseWrapper(RoleDetailDto)
   @Permissions(PERM.ROLE.LIST)
@@ -32,6 +36,7 @@ export class RoleController {
     return this.roleService.getRoleById(Number(id));
   }
 
+  /** POST /api/role/addRole — 创建新角色 */
   @ApiOperation({ summary: '新增角色', description: '需权限: role:add' })
   @ApiResponseWrapper(RoleInfoDto)
   @Permissions(PERM.ROLE.ADD)
@@ -40,6 +45,7 @@ export class RoleController {
     return this.roleService.addRole(dto);
   }
 
+  /** POST /api/role/updateRole — 更新角色信息 */
   @ApiOperation({ summary: '更新角色', description: '需权限: role:update' })
   @ApiResponseWrapper(RoleInfoDto)
   @Permissions(PERM.ROLE.UPDATE)
@@ -48,6 +54,7 @@ export class RoleController {
     return this.roleService.updateRole(dto);
   }
 
+  /** POST /api/role/delRole — 物理删除角色及其关联 */
   @ApiOperation({ summary: '删除角色', description: '需权限: role:delete' })
   @ApiMessageResponse()
   @Permissions(PERM.ROLE.DELETE)
@@ -56,6 +63,7 @@ export class RoleController {
     return this.roleService.delRole(Number(id));
   }
 
+  /** POST /api/role/assignMenus — 全量覆盖角色菜单 */
   @ApiOperation({ summary: '为角色分配菜单', description: '需权限: role:assignMenu' })
   @ApiMessageResponse()
   @Permissions(PERM.ROLE.ASSIGN_MENU)

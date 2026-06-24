@@ -9,6 +9,7 @@ import { API_PATH, CONFIG_DEFAULTS } from '../constant';
 import { ApiResponseWrapper, ApiMessageResponse, ApiResponseWrapperDto } from '../common/swagger';
 import { I18nService } from 'nestjs-i18n';
 
+/** 公开认证控制器 — 无需登录即可访问 */
 @ApiTags('public/auth')
 @Controller('public/auth')
 export class PublicAuthController {
@@ -17,6 +18,7 @@ export class PublicAuthController {
     private i18n: I18nService,
   ) {}
 
+  /** GET /public/auth/getCaptcha — 获取 SVG 图形验证码 */
   @ApiOperation({ summary: '获取图形验证码' })
   @ApiExtraModels(ApiResponseWrapperDto)
   @ApiResponse({
@@ -39,8 +41,10 @@ export class PublicAuthController {
     return svg;
   }
 
+  /** POST /public/auth/login — 用户名+密码+验证码登录，成功后写入 Session */
   @ApiOperation({ summary: '用户登录' })
   @ApiResponseWrapper(LoginResultDto)
+  @ApiResponse({ status: 400, description: '验证码错误或账号密码不匹配' })
   @RateLimit({
     windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_WINDOW_SECONDS,
     max: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_MAX,
@@ -50,6 +54,7 @@ export class PublicAuthController {
     return this.authService.login(dto, session);
   }
 
+  /** POST /public/auth/logout — 销毁当前 Session，退出登录 */
   @ApiOperation({ summary: '用户登出' })
   @ApiMessageResponse()
   @Post(API_PATH.AUTH.LOGOUT)
