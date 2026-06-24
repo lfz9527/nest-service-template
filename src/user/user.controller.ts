@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -45,16 +45,26 @@ export class UserController {
     return this.userService.addUser(dto);
   }
 
-  /** POST /api/user/updateUser — 更新用户信息 */
+  /** POST /api/user/updateUser — 更新用户信息，id 必填其余字段可选 */
   @ApiOperation({ summary: '更新用户' })
+  @ApiExtraModels(UpdateUserDto)
+  @ApiBody({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(UpdateUserDto) },
+        { type: 'object', properties: { id: { type: 'number', description: '用户ID', example: 1 } }, required: ['id'] },
+      ],
+    },
+  })
   @ApiResponseWrapper(UserBriefDto)
   @Post(API_PATH.USER.UPDATE)
   updateUser(@Body() dto: UpdateUserDto & { id: number }) {
     return this.userService.updateUser(dto);
   }
 
-  /** POST /api/user/delUser — 软删除用户（置 deletedAt + 禁用状态） */
+  /** POST /api/user/delUser — 软删除用户 */
   @ApiOperation({ summary: '删除用户（软删除）' })
+  @ApiBody({ schema: { type: 'object', properties: { id: { type: 'number', description: '用户ID', example: 1 } }, required: ['id'] } })
   @ApiMessageResponse()
   @Post(API_PATH.USER.DELETE)
   delUser(@Body('id') id: number) {
@@ -63,6 +73,16 @@ export class UserController {
 
   /** POST /api/user/assignRoles — 全量覆盖用户角色 */
   @ApiOperation({ summary: '为用户分配角色' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        userId: { type: 'number', description: '用户ID', example: 1 },
+        roleIds: { type: 'array', items: { type: 'number' }, description: '角色ID数组', example: [1, 2] },
+      },
+      required: ['userId', 'roleIds'],
+    },
+  })
   @ApiMessageResponse()
   @Post(API_PATH.USER.ASSIGN_ROLES)
   assignRoles(@Body('userId') userId: number, @Body() body: AssignRolesDto) {

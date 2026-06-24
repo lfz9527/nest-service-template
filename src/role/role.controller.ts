@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -17,7 +17,7 @@ import { ApiResponseWrapper, ApiArrayResponse, ApiMessageResponse, ApiCommonErro
 export class RoleController {
   constructor(private roleService: RoleService) {}
 
-  /** GET /api/role/getRoleList — 获取全部角色（含关联菜单及用户统计） */
+  /** GET /api/role/getRoleList — 获取全部角色 */
   @ApiOperation({ summary: '获取角色列表' })
   @ApiArrayResponse(RoleListItemDto)
   @Get(API_PATH.ROLE.LIST)
@@ -41,16 +41,26 @@ export class RoleController {
     return this.roleService.addRole(dto);
   }
 
-  /** POST /api/role/updateRole — 更新角色信息 */
+  /** POST /api/role/updateRole — 更新角色，id 必填其余字段可选 */
   @ApiOperation({ summary: '更新角色' })
+  @ApiExtraModels(UpdateRoleDto)
+  @ApiBody({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(UpdateRoleDto) },
+        { type: 'object', properties: { id: { type: 'number', description: '角色ID', example: 1 } }, required: ['id'] },
+      ],
+    },
+  })
   @ApiResponseWrapper(RoleInfoDto)
   @Post(API_PATH.ROLE.UPDATE)
   updateRole(@Body() dto: UpdateRoleDto & { id: number }) {
     return this.roleService.updateRole(dto);
   }
 
-  /** POST /api/role/delRole — 物理删除角色及其关联 */
+  /** POST /api/role/delRole — 物理删除角色 */
   @ApiOperation({ summary: '删除角色' })
+  @ApiBody({ schema: { type: 'object', properties: { id: { type: 'number', description: '角色ID', example: 1 } }, required: ['id'] } })
   @ApiMessageResponse()
   @Post(API_PATH.ROLE.DELETE)
   delRole(@Body('id') id: number) {
@@ -59,6 +69,16 @@ export class RoleController {
 
   /** POST /api/role/assignMenus — 全量覆盖角色菜单 */
   @ApiOperation({ summary: '为角色分配菜单' })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        roleId: { type: 'number', description: '角色ID', example: 1 },
+        menuIds: { type: 'array', items: { type: 'number' }, description: '菜单ID数组', example: [1, 2, 3] },
+      },
+      required: ['roleId', 'menuIds'],
+    },
+  })
   @ApiMessageResponse()
   @Post(API_PATH.ROLE.ASSIGN_MENUS)
   assignMenus(@Body('roleId') roleId: number, @Body() body: AssignMenusDto) {

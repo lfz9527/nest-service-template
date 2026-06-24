@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -39,16 +39,26 @@ export class MenuController {
     return this.menuService.addMenu(dto);
   }
 
-  /** POST /api/menu/updateMenu — 更新菜单信息 */
+  /** POST /api/menu/updateMenu — 更新菜单，id 必填其余字段可选 */
   @ApiOperation({ summary: '更新菜单' })
+  @ApiExtraModels(UpdateMenuDto)
+  @ApiBody({
+    schema: {
+      allOf: [
+        { $ref: getSchemaPath(UpdateMenuDto) },
+        { type: 'object', properties: { id: { type: 'number', description: '菜单ID', example: 1 } }, required: ['id'] },
+      ],
+    },
+  })
   @ApiResponseWrapper(MenuInfoDto)
   @Post(API_PATH.MENU.UPDATE)
   updateMenu(@Body() dto: UpdateMenuDto & { id: number }) {
     return this.menuService.updateMenu(dto);
   }
 
-  /** POST /api/menu/delMenu — 删除菜单（有子菜单时禁止） */
+  /** POST /api/menu/delMenu — 删除菜单 */
   @ApiOperation({ summary: '删除菜单' })
+  @ApiBody({ schema: { type: 'object', properties: { id: { type: 'number', description: '菜单ID', example: 1 } }, required: ['id'] } })
   @ApiMessageResponse()
   @Post(API_PATH.MENU.DELETE)
   delMenu(@Body('id') id: number) {
