@@ -42,18 +42,7 @@ export class UserController {
 
   /** POST /api/user/addUser — 创建新用户 */
   @ApiOperation({ summary: '新增用户' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        username: { type: 'string', description: '用户名', example: 'zhangsan' },
-        password: { type: 'string', description: '密码（明文，服务端 bcrypt 哈希后入库）', example: 'Abc12345' },
-        email: { type: 'string', description: '邮箱', example: 'test@example.com' },
-        phone: { type: 'string', description: '手机号', example: '13800138000' },
-      },
-      required: ['username', 'password'],
-    },
-  })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponseWrapper(UserBriefDto)
   @Post(API_PATH.USER.ADD)
   addUser(@Body() dto: CreateUserDto) {

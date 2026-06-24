@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Session } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResultDto } from './dto/login-result.dto';
@@ -43,17 +43,8 @@ export class PublicAuthController {
 
   /** POST /public/auth/login — 用户名+密码+验证码登录，成功后写入 Session */
   @ApiOperation({ summary: '用户登录' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        username: { type: 'string', description: '用户名', example: 'admin' },
-        password: { type: 'string', description: '密码', example: 'Abc12345' },
-        captcha: { type: 'string', description: '图形验证码', example: 'a3x9' },
-      },
-      required: ['username', 'password', 'captcha'],
-    },
-  })
+  @ApiConsumes('application/json')
+  @ApiBody({ type: LoginDto })
   @ApiResponseWrapper(LoginResultDto)
   @ApiResponse({ status: 400, description: '验证码错误或账号密码不匹配' })
   @RateLimit({

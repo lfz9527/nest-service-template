@@ -36,17 +36,7 @@ export class RoleController {
 
   /** POST /api/role/addRole — 创建新角色 */
   @ApiOperation({ summary: '新增角色' })
-  @ApiBody({
-    schema: {
-      type: 'object',
-      properties: {
-        name: { type: 'string', description: '角色名称', example: '运营' },
-        code: { type: 'string', description: '角色编码（唯一标识）', example: 'operator' },
-        description: { type: 'string', description: '角色描述', example: '日常运营权限' },
-      },
-      required: ['name', 'code'],
-    },
-  })
+  @ApiBody({ type: CreateRoleDto })
   @ApiResponseWrapper(RoleInfoDto)
   @Post(API_PATH.ROLE.ADD)
   addRole(@Body() dto: CreateRoleDto) {
