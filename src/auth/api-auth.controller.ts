@@ -12,10 +12,10 @@ import { ApiResponseWrapper, ApiCommonErrorResponses } from '../common/swagger';
 @ApiCommonErrorResponses()
 @Controller('api/auth')
 export class ApiAuthController {
-  constructor(private authService: AuthService) {}
+  constructor(private authService: AuthService) { }
 
   /** GET /api/auth/getUserInfo — 获取当前登录用户的个人信息及菜单权限树 */
-  @ApiOperation({ summary: '获取当前用户信息（含权限菜单树）' })
+  @ApiOperation({ summary: '获取当前用户信息' })
   @ApiResponseWrapper(UserInfoDto)
   @Get(API_PATH.AUTH.USER_INFO)
   async getUserInfo(@Req() req: Request) {

@@ -11,13 +11,13 @@ export class MenuInfoDto {
   @ApiProperty({ description: '权限码', example: 'user:list' })
   code: string;
 
-  @ApiProperty({ description: '父级菜单ID', required: false, example: null })
+  @ApiProperty({ type: Number, description: '父级菜单ID', required: false, nullable: true, example: null })
   parentId: number | null;
 
-  @ApiProperty({ description: '前端路由路径', required: false, example: '/user' })
+  @ApiProperty({ type: String, description: '前端路由路径', required: false, nullable: true, example: '/user' })
   path: string | null;
 
-  @ApiProperty({ description: '图标', required: false, example: 'UserOutlined' })
+  @ApiProperty({ type: String, description: '图标', required: false, nullable: true, example: 'UserOutlined' })
   icon: string | null;
 
   @ApiProperty({ description: '排序号', example: 1 })

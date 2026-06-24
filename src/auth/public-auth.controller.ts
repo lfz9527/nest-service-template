@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Session } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiConsumes, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResultDto } from './dto/login-result.dto';
@@ -16,7 +16,7 @@ export class PublicAuthController {
   constructor(
     private authService: AuthService,
     private i18n: I18nService,
-  ) {}
+  ) { }
 
   /** GET /public/auth/getCaptcha — 获取 SVG 图形验证码 */
   @ApiOperation({ summary: '获取图形验证码' })
@@ -43,7 +43,6 @@ export class PublicAuthController {
 
   /** POST /public/auth/login — 用户名+密码+验证码登录，成功后写入 Session */
   @ApiOperation({ summary: '用户登录' })
-  @ApiConsumes('application/json')
   @ApiBody({ type: LoginDto })
   @ApiResponseWrapper(LoginResultDto)
   @ApiResponse({ status: 400, description: '验证码错误或账号密码不匹配' })

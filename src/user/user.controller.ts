@@ -16,7 +16,7 @@ import { ApiPaginatedResponse, ApiResponseWrapper, ApiMessageResponse, ApiCommon
 @ApiCommonErrorResponses()
 @Controller('api/user')
 export class UserController {
-  constructor(private userService: UserService) {}
+  constructor(private userService: UserService) { }
 
   /** GET /api/user/getUserList — 分页查询用户列表 */
   @ApiOperation({ summary: '获取用户列表' })
@@ -67,7 +67,7 @@ export class UserController {
   }
 
   /** POST /api/user/delUser — 软删除用户 */
-  @ApiOperation({ summary: '删除用户（软删除）' })
+  @ApiOperation({ summary: '删除用户' })
   @ApiBody({ schema: { type: 'object', properties: { id: { type: 'number', description: '用户ID', example: 1 } }, required: ['id'] } })
   @ApiMessageResponse()
   @Post(API_PATH.USER.DELETE)

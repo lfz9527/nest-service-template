@@ -50,6 +50,11 @@ export class RoleDetailDto {
   @ApiProperty({ description: '关联菜单（含连接表字段）', type: [RoleMenuJoinDto] })
   roleMenus: RoleMenuJoinDto[];
 
-  @ApiProperty({ description: '用户数量统计', example: { userRoles: 2 } })
+  @ApiProperty({
+    description: '用户数量统计',
+    type: 'object',
+    properties: { userRoles: { type: 'number', description: '关联用户数', example: 2 } },
+    example: { userRoles: 2 },
+  })
   _count: { userRoles: number };
 }
