@@ -1,22 +1,19 @@
 import { IsNotEmpty, IsString, IsOptional } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { ApiProperty } from '@nestjs/swagger';
 
-/**
- * 创建角色 DTO（数据传输对象）
- * 用于接收前端提交的创建角色请求数据，并执行字段校验
- */
 export class CreateRoleDto {
-  /** 角色名称，必填且必须为字符串 */
+  @ApiProperty({ description: '角色名称', example: '运营' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.role_name_required') })
   @IsString()
   name: string;
 
-  /** 角色编码（唯一标识），必填且必须为字符串 */
+  @ApiProperty({ description: '角色编码（唯一标识）', example: 'operator' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.role_code_required') })
   @IsString()
   code: string;
 
-  /** 角色描述，可选字段 */
+  @ApiProperty({ description: '角色描述', required: false, example: '日常运营权限' })
   @IsOptional()
   @IsString()
   description?: string;

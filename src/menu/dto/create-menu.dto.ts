@@ -1,37 +1,34 @@
 import { IsNotEmpty, IsString, IsOptional, IsInt } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { ApiProperty } from '@nestjs/swagger';
 
-/**
- * 创建菜单 DTO（数据传输对象）
- * 用于接收前端提交的创建菜单请求数据，并执行字段校验
- */
 export class CreateMenuDto {
-  /** 菜单名称，必填 */
+  @ApiProperty({ description: '菜单名称', example: '用户管理' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.menu_name_required') })
   @IsString()
   name: string;
 
-  /** 菜单编码（唯一标识），必填 */
+  @ApiProperty({ description: '菜单编码（权限标识）', example: 'user:list' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.menu_code_required') })
   @IsString()
   code: string;
 
-  /** 父级菜单 ID，用于构建树形结构，可选 */
+  @ApiProperty({ description: '父级菜单ID（用于构建树形结构）', required: false, example: null })
   @IsOptional()
   @IsInt()
   parentId?: number;
 
-  /** 前端路由路径，可选 */
+  @ApiProperty({ description: '前端路由路径', required: false, example: '/user/list' })
   @IsOptional()
   @IsString()
   path?: string;
 
-  /** 菜单图标类名，可选 */
+  @ApiProperty({ description: '图标类名', required: false, example: 'UserOutlined' })
   @IsOptional()
   @IsString()
   icon?: string;
 
-  /** 排序序号，值越小越靠前，可选 */
+  @ApiProperty({ description: '排序序号（值越小越靠前）', required: false, example: 1 })
   @IsOptional()
   @IsInt()
   sortOrder?: number;

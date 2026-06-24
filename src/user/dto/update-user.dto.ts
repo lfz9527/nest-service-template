@@ -1,18 +1,19 @@
 import { IsOptional, IsString, IsEmail, IsInt, MinLength } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
-import { CONFIG_DEFAULTS } from '../../constant';
+import { ApiProperty } from '@nestjs/swagger';
+import { CONFIG_DEFAULTS, EntityStatus } from '../../constant';
 
-/**
- * 更新用户请求数据传输对象
- * 所有字段均为可选，仅更新提供的字段
- */
 export class UpdateUserDto {
-  /** 用户名 */
+  @ApiProperty({ description: '用户名', required: false, example: 'zhangsan' })
   @IsOptional()
   @IsString()
   username?: string;
 
-  /** 新密码（非空时触发密码重哈希） */
+  @ApiProperty({
+    description: '新密码（非空时触发密码重哈希）',
+    required: false,
+    example: 'NewPass123',
+  })
   @IsOptional()
   @IsString()
   @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
@@ -20,17 +21,22 @@ export class UpdateUserDto {
   })
   password?: string;
 
-  /** 邮箱 */
+  @ApiProperty({ description: '邮箱', required: false, example: 'newemail@example.com' })
   @IsOptional()
   @IsEmail({}, { message: i18nValidationMessage('validation.email_invalid') })
   email?: string;
 
-  /** 手机号 */
+  @ApiProperty({ description: '手机号', required: false, example: '13900139000' })
   @IsOptional()
   @IsString()
   phone?: string;
 
-  /** 用户状态：1-启用，0-禁用 */
+  @ApiProperty({
+    description: '用户状态',
+    required: false,
+    enum: EntityStatus,
+    example: EntityStatus.ENABLED,
+  })
   @IsOptional()
   @IsInt()
   status?: number;

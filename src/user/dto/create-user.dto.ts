@@ -1,18 +1,15 @@
 import { IsNotEmpty, IsString, IsOptional, IsEmail, MinLength } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
+import { ApiProperty } from '@nestjs/swagger';
 import { CONFIG_DEFAULTS } from '../../constant';
 
-/**
- * 创建用户请求数据传输对象
- * 用户名和密码为必填，邮箱和手机号为可选
- */
 export class CreateUserDto {
-  /** 用户名 */
+  @ApiProperty({ description: '用户名', example: 'zhangsan' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.username_required') })
   @IsString()
   username: string;
 
-  /** 密码（明文，服务端会做 bcrypt 哈希后入库） */
+  @ApiProperty({ description: '密码（明文，服务端 bcrypt 哈希后入库）', example: 'Abc12345' })
   @IsNotEmpty({ message: i18nValidationMessage('validation.password_required') })
   @IsString()
   @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
@@ -20,12 +17,12 @@ export class CreateUserDto {
   })
   password: string;
 
-  /** 邮箱（可选） */
+  @ApiProperty({ description: '邮箱', required: false, example: 'test@example.com' })
   @IsOptional()
   @IsEmail({}, { message: i18nValidationMessage('validation.email_invalid') })
   email?: string;
 
-  /** 手机号（可选） */
+  @ApiProperty({ description: '手机号', required: false, example: '13800138000' })
   @IsOptional()
   @IsString()
   phone?: string;
