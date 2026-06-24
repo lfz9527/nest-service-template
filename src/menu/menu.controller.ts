@@ -34,6 +34,7 @@ export class MenuController {
 
   /** POST /api/menu/addMenu — 创建新菜单节点 */
   @ApiOperation({ summary: '新增菜单' })
+  @ApiBody({ type: CreateMenuDto })
   @ApiResponseWrapper(MenuInfoDto)
   @Post(API_PATH.MENU.ADD)
   addMenu(@Body() dto: CreateMenuDto) {

@@ -36,6 +36,7 @@ export class RoleController {
 
   /** POST /api/role/addRole — 创建新角色 */
   @ApiOperation({ summary: '新增角色' })
+  @ApiBody({ type: CreateRoleDto })
   @ApiResponseWrapper(RoleInfoDto)
   @Post(API_PATH.ROLE.ADD)
   addRole(@Body() dto: CreateRoleDto) {

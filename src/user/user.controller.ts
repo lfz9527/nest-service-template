@@ -42,6 +42,7 @@ export class UserController {
 
   /** POST /api/user/addUser — 创建新用户 */
   @ApiOperation({ summary: '新增用户' })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponseWrapper(UserBriefDto)
   @Post(API_PATH.USER.ADD)
   addUser(@Body() dto: CreateUserDto) {
