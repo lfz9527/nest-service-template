@@ -20,7 +20,7 @@
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "commit": "git add . & commit-kit-cz",
+    "commit": "commit-kit-cz",
     "prepare": "husky"
   },
   "keywords": [],
