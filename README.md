@@ -85,7 +85,7 @@ curl http://localhost:3000/api/user/list \
 | `/api/menu/updateMenu` | POST | 是 | 更新菜单 |
 | `/api/menu/delMenu` | POST | 是 | 删除菜单 |
 
-> Swagger 文档：开发环境访问 `http://localhost:{port}/api-docs`，JSON 导出用 `npm run build && npx ts-node scripts/dump-swagger.ts`。
+> Swagger 文档：开发环境访问 `http://localhost:{port}/api-docs`，OpenAPI JSON 通过 `/api-docs-json` 端点获取。
 
 ## 统一响应格式
 
@@ -116,7 +116,6 @@ src/
 ├── prisma/            # PrismaService 封装
 └── logger/            # 日志模块配置
 scripts/
-├── dump-swagger.ts    # 导出 OpenAPI JSON
 └── check-doc-update.sh # Claude Code hook 脚本
 ```
 

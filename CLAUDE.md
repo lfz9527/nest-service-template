@@ -70,7 +70,7 @@ src/{feature}/
 ```
 
 **Swagger / OpenAPI**：
-- 文档路径：开发环境 `http://localhost:{port}/api-docs`，JSON 通过 `scripts/dump-swagger.ts` 导出 `openapi-dump.json`
+- 文档路径：开发环境 `http://localhost:{port}/api-docs`，OpenAPI JSON 通过 `/api-docs-json` 端点获取
 - Swagger CLI 插件已禁用（`nest-cli.json` 无 plugins 配置）——插件会覆盖显式 `@ApiQuery` / `@ApiBody` 类型声明，导致 Apifox 参数识别错误
 - POST 默认 `application/json`，无需 `@ApiConsumes`
 - `@ApiBody` 支持 `examples` 字段提供请求示例：`@ApiBody({ type: LoginDto, examples: { admin: { summary: '管理员登录', value: {...} } } })`
@@ -103,7 +103,6 @@ src/{feature}/
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
 - `src/common/dto/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
 - `src/common/swagger/response-wrapper.ts` — 统一响应包装装饰器（`ApiResponseWrapper`、`ApiPaginatedResponse`、`ApiArrayResponse`、`ApiMessageResponse`、`ApiHealthResponse`、`ApiCommonErrorResponses`）。
-- `scripts/dump-swagger.ts` — 导出 OpenAPI JSON 到 `openapi-dump.json`，用于 Apifox 等工具导入。
 - `scripts/check-doc-update.sh` — `Stop` + `PostToolUse` hook 脚本，检测源码变更并注入 CLAUDE.md 更新提醒。
 - `.claude/settings.local.json` — 项目级本地设置（权限、hooks），不提交到仓库。
 - `src/logger/logger.module.ts` — Pino 日志配置，`genReqId` 使用 `randomUUID()` 为每个请求生成唯一 ID；开发环境 pino-pretty 彩色输出，生产环境双 target（stdout JSON + pino-roll 文件轮转）。
