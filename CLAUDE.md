@@ -69,6 +69,26 @@ src/{feature}/
   dto/*.dto.ts
 ```
 
+**Swagger / OpenAPI**：
+- 文档路径：开发环境 `http://localhost:{port}/api-docs`，JSON 通过 `scripts/dump-swagger.ts` 导出 `openapi-dump.json`
+- Swagger CLI 插件已禁用（`nest-cli.json` 无 plugins 配置）——插件会覆盖显式 `@ApiQuery` / `@ApiBody` 类型声明，导致 Apifox 参数识别错误
+- POST 默认 `application/json`，无需 `@ApiConsumes`
+- `@ApiBody` 支持 `examples` 字段提供请求示例：`@ApiBody({ type: LoginDto, examples: { admin: { summary: '管理员登录', value: {...} } } })`
+
+**DTO Swagger 类型注解规则**（Apifox 兼容性关键）：
+- ⚠️ TypeScript 联合类型（`number | null`、`string | null`）在运行时无法被 NestJS Swagger 反射，会错误生成为 `type: object`。必须显式加 `type` + `nullable`：
+  ```typescript
+  @ApiProperty({ type: Number, nullable: true, ... }) parentId: number | null;
+  @ApiProperty({ type: String, nullable: true, ... }) path: string | null;
+  ```
+- ⚠️ 内联对象类型（如 Prisma 的 `_count: { userRoles: number }`）同样无法反射，会生成无 `properties` 的 `type: object`。必须显式声明 `properties`：
+  ```typescript
+  @ApiProperty({ type: 'object', properties: { userRoles: { type: 'number', ... } }, ... })
+  _count: { userRoles: number };
+  ```
+- 普通类型（`string`、`number`、`boolean`、`Dto[]`）无需显式 `type`，框架自动推断
+- 响应装饰器统一从 `src/common/swagger/response-wrapper.ts` 导入：`ApiResponseWrapper`（单资源）、`ApiPaginatedResponse`（分页）、`ApiArrayResponse`（数组）、`ApiMessageResponse`（纯消息）
+
 **全局模块**（无需导入即可在任意处注入）：`PrismaModule`（导出 `PrismaService`）、`CommonModule`（守卫/拦截器/过滤器）、`LoggerModule`（导出 `PinoLogger`）。
 
 ## 关键文件
@@ -82,6 +102,8 @@ src/{feature}/
 - `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
 - `src/common/dto/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
+- `src/common/swagger/response-wrapper.ts` — 统一响应包装装饰器（`ApiResponseWrapper`、`ApiPaginatedResponse`、`ApiArrayResponse`、`ApiMessageResponse`、`ApiHealthResponse`、`ApiCommonErrorResponses`）。
+- `scripts/dump-swagger.ts` — 导出 OpenAPI JSON 到 `openapi-dump.json`，用于 Apifox 等工具导入。
 - `src/logger/logger.module.ts` — Pino 日志配置，`genReqId` 使用 `randomUUID()` 为每个请求生成唯一 ID；开发环境 pino-pretty 彩色输出，生产环境双 target（stdout JSON + pino-roll 文件轮转）。
 
 ## 环境配置
