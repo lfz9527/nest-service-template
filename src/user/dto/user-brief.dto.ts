@@ -14,6 +14,6 @@ export class UserBriefDto {
   @ApiProperty({ description: '手机号', required: false, example: '13800138000' })
   phone?: string;
 
-  @ApiProperty({ description: '状态', enum: EntityStatus, example: EntityStatus.ENABLED })
-  status: number;
+  @ApiProperty({ description: '状态（addUser 不返回此字段）', required: false, enum: EntityStatus, example: EntityStatus.ENABLED })
+  status?: number;
 }
