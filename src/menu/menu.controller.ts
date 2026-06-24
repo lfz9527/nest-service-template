@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { MenuService } from './menu.service';
 import { CreateMenuDto } from './dto/create-menu.dto';
 import { UpdateMenuDto } from './dto/update-menu.dto';
@@ -25,6 +25,7 @@ export class MenuController {
 
   /** GET /api/menu/getMenuById — 按 ID 查询单个菜单 */
   @ApiOperation({ summary: '获取菜单详情' })
+  @ApiQuery({ name: 'id', type: Number, required: true, example: 1, description: '菜单ID' })
   @ApiResponseWrapper(MenuInfoDto)
   @Get(API_PATH.MENU.BY_ID)
   getMenuById(@Query('id') id: string) {

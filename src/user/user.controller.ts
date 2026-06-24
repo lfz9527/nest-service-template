@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -20,6 +20,8 @@ export class UserController {
 
   /** GET /api/user/getUserList — 分页查询用户列表 */
   @ApiOperation({ summary: '获取用户列表' })
+  @ApiQuery({ name: 'page', type: Number, required: false, example: 1, description: '页码' })
+  @ApiQuery({ name: 'pageSize', type: Number, required: false, example: 10, description: '每页条数' })
   @ApiPaginatedResponse(UserListItemDto)
   @Get(API_PATH.USER.LIST)
   getUserList(@Query() dto: PaginationDto) {
@@ -31,6 +33,7 @@ export class UserController {
 
   /** GET /api/user/getUserById — 按 ID 查询用户详情（含关联角色） */
   @ApiOperation({ summary: '获取用户详情（含角色）' })
+  @ApiQuery({ name: 'id', type: Number, required: true, example: 1, description: '用户ID' })
   @ApiResponseWrapper(UserDetailDto)
   @Get(API_PATH.USER.BY_ID)
   getUserById(@Query('id') id: string) {

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
 import { RoleService } from './role.service';
 import { CreateRoleDto } from './dto/create-role.dto';
 import { UpdateRoleDto } from './dto/update-role.dto';
@@ -27,6 +27,7 @@ export class RoleController {
 
   /** GET /api/role/getRoleById — 按 ID 查询角色详情 */
   @ApiOperation({ summary: '获取角色详情（含菜单）' })
+  @ApiQuery({ name: 'id', type: Number, required: true, example: 1, description: '角色ID' })
   @ApiResponseWrapper(RoleDetailDto)
   @Get(API_PATH.ROLE.BY_ID)
   getRoleById(@Query('id') id: string) {
