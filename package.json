@@ -19,9 +19,7 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\"",
-    "commit": "commit-kit-cz",
-    "prepare": "husky"
+    "format:check": "prettier --check \"src/**/*.ts\""
   },
   "keywords": [],
   "author": "",
@@ -71,25 +69,5 @@
     "prettier": "^3.8.4",
     "ts-node": "^10.9.2",
     "typescript": "^6.0.3"
-  },
-  "lint-staged": {
-    "*.{js,jsx,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{css,scss,less,md,html,json}": [
-      "prettier --write"
-    ]
-  },
-  "config": {
-    "commitizen": {
-      "path": "node_modules/cz-customizable",
-      "config": {
-        "path": "./.cz-config.cjs"
-      }
-    },
-    "cz-customizable": {
-      "config": "./.cz-config.cjs"
-    }
   }
 }
