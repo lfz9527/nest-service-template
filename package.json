@@ -19,7 +19,8 @@
     "lint": "eslint \"src/**/*.ts\"",
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
-    "format:check": "prettier --check \"src/**/*.ts\""
+    "format:check": "prettier --check \"src/**/*.ts\"",
+    "clean": "rimraf node_modules  pnpm-lock.yaml || exit 0"
   },
   "keywords": [],
   "author": "",
