@@ -1,3 +1,5 @@
 allowBuilds:
   '@prisma/engines': true
   prisma: true
+minimumReleaseAgeExclude:
+  - xt-commit-kit@1.0.0

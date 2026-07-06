@@ -20,7 +20,9 @@
     "lint:fix": "eslint \"src/**/*.ts\" --fix",
     "format": "prettier --write \"src/**/*.ts\"",
     "format:check": "prettier --check \"src/**/*.ts\"",
-    "clean": "rimraf node_modules  pnpm-lock.yaml || exit 0"
+    "clean": "rimraf node_modules  pnpm-lock.yaml || exit 0",
+    "prepare": "husky",
+    "commit": "git add . && git-cz"
   },
   "keywords": [],
   "author": "",
@@ -55,6 +57,7 @@
     "seed": "ts-node prisma/seed.ts"
   },
   "devDependencies": {
+    "@commitlint/cli": "^21.2.0",
     "@nestjs/cli": "^11.0.23",
     "@nestjs/schematics": "^11.1.0",
     "@types/compression": "^1.8.1",
@@ -63,11 +66,37 @@
     "@types/node": "^25.9.3",
     "@typescript-eslint/eslint-plugin": "^8.61.1",
     "@typescript-eslint/parser": "^8.61.1",
+    "commitizen": "^4.3.2",
+    "commitlint-config-cz": "^0.13.3",
+    "cz-customizable": "^7.5.4",
     "dotenv": "^17.4.2",
     "eslint": "^10.5.0",
     "eslint-config-prettier": "^10.1.8",
+    "husky": "^9.1.7",
+    "lint-staged": "^17.0.8",
     "prettier": "^3.8.4",
     "ts-node": "^10.9.2",
-    "typescript": "^6.0.3"
+    "typescript": "^6.0.3",
+    "xt-commit-kit": "^1.0.0"
+  },
+  "config": {
+    "commitizen": {
+      "path": "node_modules/cz-customizable",
+      "config": {
+        "path": "./commit-kit/.cz-config.cjs"
+      }
+    },
+    "cz-customizable": {
+      "config": "./commit-kit/.cz-config.cjs"
+    }
+  },
+  "lint-staged": {
+    "*.{js,jsx,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{css,scss,less,md,html,json}": [
+      "prettier --write"
+    ]
   }
 }
