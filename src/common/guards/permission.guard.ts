@@ -27,11 +27,13 @@ export class PermissionGuard implements CanActivate {
     const request = context.switchToHttp().getRequest();
     const userId = request.session?.userId;
     if (!userId) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', {
+        businessCode: FORBIDDEN,
+      });
     }
 
     const userWithRoles = await this.prisma.user.findFirst({
-      where: { id: userId, deletedAt: null },
+      where: { id: userId },
       include: {
         userRoles: {
           include: {
@@ -48,7 +50,9 @@ export class PermissionGuard implements CanActivate {
     });
 
     if (!userWithRoles) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', {
+        businessCode: FORBIDDEN,
+      });
     }
 
     const menuCodes = new Set<string>();
@@ -63,7 +67,9 @@ export class PermissionGuard implements CanActivate {
     }
 
     if (!menuCodes.has(requiredPermission)) {
-      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', { businessCode: FORBIDDEN });
+      throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', {
+        businessCode: FORBIDDEN,
+      });
     }
 
     return true;
