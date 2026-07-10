@@ -1,5 +1,12 @@
-import { Controller, Get, Post, Body, Session } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiExtraModels, ApiResponse, getSchemaPath } from '@nestjs/swagger';
+import { Controller, Get, Post, Body, Session, Req } from '@nestjs/common';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiExtraModels,
+  ApiResponse,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 import { LoginDto } from './dto/login.dto';
 import { LoginResultDto } from './dto/login-result.dto';
@@ -16,7 +23,7 @@ export class PublicAuthController {
   constructor(
     private authService: AuthService,
     private i18n: I18nService,
-  ) { }
+  ) {}
 
   /** GET /public/auth/getCaptcha — 获取 SVG 图形验证码 */
   @ApiOperation({ summary: '获取图形验证码' })
@@ -27,7 +34,11 @@ export class PublicAuthController {
     schema: {
       allOf: [
         { $ref: getSchemaPath(ApiResponseWrapperDto) },
-        { properties: { data: { type: 'string', description: 'SVG 验证码图片', example: '<svg>...</svg>' } } },
+        {
+          properties: {
+            data: { type: 'string', description: 'SVG 验证码图片', example: '<svg>...</svg>' },
+          },
+        },
       ],
     },
   })
@@ -51,16 +62,20 @@ export class PublicAuthController {
     max: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_MAX,
   })
   @Post(API_PATH.AUTH.LOGIN)
-  login(@Body() dto: LoginDto, @Session() session: AppSession) {
-    return this.authService.login(dto, session);
+  login(
+    @Body() dto: LoginDto,
+    @Session() session: AppSession,
+    @Req() req: import('express').Request,
+  ) {
+    return this.authService.login(dto, session, req);
   }
 
   /** POST /public/auth/logout — 销毁当前 Session，退出登录 */
   @ApiOperation({ summary: '用户登出' })
   @ApiMessageResponse()
   @Post(API_PATH.AUTH.LOGOUT)
-  logout(@Session() session: AppSession) {
-    this.authService.logout(session);
+  async logout(@Session() session: AppSession, @Req() req: import('express').Request) {
+    await this.authService.logout(session, req);
     return { message: this.i18n.t('auth.logout_success') };
   }
 }

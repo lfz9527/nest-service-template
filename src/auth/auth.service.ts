@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus, CONFIG_DEFAULTS } from '../constant';
+import { HttpStatus, EntityStatus, CONFIG_DEFAULTS, SESSION_MODE } from '../constant';
 import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
@@ -27,7 +27,11 @@ export class AuthService {
     return captcha.data;
   }
 
-  async login(dto: LoginDto, session: AppSession): Promise<{ userId: number; username: string }> {
+  async login(
+    dto: LoginDto,
+    session: AppSession,
+    req: import('express').Request,
+  ): Promise<{ userId: number; username: string }> {
     if (!session.captcha) {
       this.logger.warn('Login failed: captcha not initialized');
       throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.need_captcha');
@@ -53,13 +57,53 @@ export class AuthService {
       throw new BusinessException(HttpStatus.BAD_REQUEST, 'auth.login_failed');
     }
 
+    // 单机登录：更新活跃 Session 映射，销毁旧 Session
+    const isSingleMode = process.env.SESSION_MODE === SESSION_MODE.SINGLE;
+    if (isSingleMode && req.sessionStore) {
+      const oldRecord = await this.prisma.userSession.findUnique({
+        where: { userId: user.id },
+      });
+
+      // upsert 保证原子性 —— 两个设备同时登录时后提交者覆盖先提交者
+      await this.prisma.userSession.upsert({
+        where: { userId: user.id },
+        create: { userId: user.id, sessionId: session.id },
+        update: { sessionId: session.id },
+      });
+
+      // 销毁旧 Session（忽略结果，不影响登录流程）
+      if (oldRecord?.sessionId && oldRecord.sessionId !== session.id) {
+        req.sessionStore.destroy(oldRecord.sessionId, (err) => {
+          if (err) {
+            this.logger.error(
+              { err, oldSessionId: oldRecord.sessionId },
+              'Failed to destroy old session',
+            );
+          }
+        });
+      }
+    }
+
     session.userId = user.id;
     this.logger.info({ userId: user.id, username: user.username }, 'Login success');
     return { userId: user.id, username: user.username };
   }
 
-  logout(session: AppSession): void {
+  async logout(session: AppSession, req: import('express').Request): Promise<void> {
     const userId = session.userId;
+
+    // 单机登录：先删 UserSession，再销毁 Session
+    // 顺序保证：即使 session.destroy 失败，AuthGuard 查不到 UserSession 也返回 402
+    const isSingleMode = process.env.SESSION_MODE === SESSION_MODE.SINGLE;
+    if (isSingleMode && userId != null) {
+      await this.prisma.userSession.delete({ where: { userId } }).catch((err) => {
+        if (err?.code !== 'P2025') {
+          this.logger.error({ userId, err }, 'Failed to delete UserSession');
+        }
+        // P2025（记录不存在）属正常情况（用户已登出或从未单机登录），忽略
+      });
+    }
+
     session.destroy((err) => {
       if (err) {
         this.logger.error({ userId, err }, 'Session destroy failed');
