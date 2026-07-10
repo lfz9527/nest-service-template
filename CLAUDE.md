@@ -104,7 +104,7 @@ src/{feature}/
 - `prisma/seed.ts` — 填充管理员/普通用户账号、角色（`super_admin` / `user`）及系统菜单。
 - `src/i18n/` — 翻译文件，按语言/模块拆分 JSON。新增 key 需同时在 zh-CN 和 en 中添加。
 - `src/generated/` — 自动生成文件（Prisma Client + i18n 类型），禁止手动编辑。ESLint/Prettier 已忽略。
-- `src/constant/` — 集中管理常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`，含 `KICKED_OFF=402`）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`config.defaults.ts`（`CONFIG_DEFAULTS` 默认值）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）、`session-mode.ts`（`SESSION_MODE.SINGLE` / `SESSION_MODE.MULTI` 模式常量）。
+- `src/constant/` — 集中管理常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`，含 `KICKED_OFF=402`）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`config.defaults.ts`（`CONFIG_DEFAULTS` 默认值）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）、`session-mode.ts`（`SESSION_MODE.SINGLE` / `SESSION_MODE.MULTI` 模式常量）、`prisma-codes.ts`（`PRISMA_CODES` Prisma 错误码常量）。
 - `src/common/response.ts` — `ApiResponse` 静态类，`success(data, message)` 和 `fail(message)`。message 无默认值，由 Interceptor 传入翻译后的字符串。
 - `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
