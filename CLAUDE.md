@@ -100,7 +100,7 @@ src/{feature}/
 
 ## 关键文件
 
-- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu、UserSession）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。User 采用软删除（`deletedAt` 字段），Role/Menu 为物理删除。`UserSession` 记录单机登录模式下的活跃 Session（`userId` 主键 + `sessionId`）。
+- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu、UserSession）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。User、Role、Menu 均为物理删除，Prisma Cascade 自动清理关联表。`UserSession` 记录单机登录模式下的活跃 Session（`userId` 主键 + `sessionId`）。
 - `prisma/seed.ts` — 填充管理员/普通用户账号、角色（`super_admin` / `user`）及系统菜单。
 - `src/i18n/` — 翻译文件，按语言/模块拆分 JSON。新增 key 需同时在 zh-CN 和 en 中添加。
 - `src/generated/` — 自动生成文件（Prisma Client + i18n 类型），禁止手动编辑。ESLint/Prettier 已忽略。
