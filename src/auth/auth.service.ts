@@ -89,7 +89,7 @@ export class AuthService {
     return { userId: user.id, username: user.username };
   }
 
-  async logout(session: AppSession, req: import('express').Request): Promise<void> {
+  async logout(session: AppSession, _req: import('express').Request): Promise<void> {
     const userId = session.userId;
 
     // 单机登录：先删 UserSession，再销毁 Session
