@@ -26,6 +26,7 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 ## 架构
 
 **启动流程**（`main.ts`）：
+
 1. 校验必需环境变量 → 缺失则直接 `exit(1)`
 2. 创建 NestJS 实例 → 加载 Helmet（安全头）+ CORS（跨域，credentials 模式）+ Compression（gzip 压缩）
 3. 注册 `I18nValidationPipe`（全局校验 + i18n 错误消息）
@@ -33,11 +34,12 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 5. 解析端口：生产环境直接使用配置端口；开发环境端口被占用时自动切换下一个可用端口（最多尝试 100 个）
 6. 注册优雅退出钩子（`enableShutdownHooks`），Docker/K8s SIGTERM 时等待当前请求完成
 
-**认证流程**：Express Session 存储在 MySQL 中（express-mysql-session）。`AuthGuard` 检查 `session.userId` —— 不存在则视为未登录。公开接口以 `/public/` 为前缀，在 AuthGuard 中按路径放行。
+**认证流程**：Express Session 存储在 MySQL 中（express-mysql-session）。`AuthGuard` 检查 `session.userId` —— 不存在则视为未登录。公开接口以 `/public/` 为前缀，在 AuthGuard 中按路径放行。支持单机/多机登录模式：`SESSION_MODE=single` 时 `UserSession` 表记录当前活跃 Session，登录时踢旧、AuthGuard 校验 sessionId 不匹配则返回 402；默认 `multi` 保持原有行为。
 
 **授权模型**：User → UserRole → Role → RoleMenu → Menu。每条 `Menu` 记录有一个 `code` 字段（如 `user:list`、`role:delete`）。在路由上使用 `@Permissions(code)` 装饰器声明所需权限码；`PermissionGuard` 查询当前用户的启用角色及其启用菜单，判断是否拥有该权限码。未标注 `@Permissions()` 的路由对所有已登录用户开放。
 
 **全局处理管线**（在 `CommonModule` 中注册）：
+
 1. `RateLimitGuard` — 对标注 `@RateLimit()` 的路由限流
 2. `AuthGuard` — 拦截未登录请求（`/public/*` 除外）
 3. `PermissionGuard` — 拦截无权限请求（仅对标注了 `@Permissions` 的路由生效）
@@ -46,6 +48,7 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 6. `HttpExceptionFilter` — 将异常包装为 `ApiResponse.fail(message)`，通过 I18nContext 翻译 i18nKey
 
 **国际化（i18n）**：
+
 - 框架：nestjs-i18n（底层 i18next）
 - 翻译文件：`src/i18n/{zh-CN,en}/*.json`，按模块拆分（auth / user / role / menu / common / prisma / permission / rate-limit / validation）
 - 语言解析：`AcceptLanguageResolver` 读 `Accept-Language` 请求头，缺失时兜底 `zh-CN`
@@ -56,11 +59,13 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 - ESLint / Prettier 忽略 `src/generated/**`（已配置）
 
 **路由规范**：
+
 - `/public/auth/*` — 无需登录（登录、验证码、登出）
 - `/api/{module}/*` — 需登录，配合 `@Permissions()` 权限守卫
 - 健康检查：`GET /health` 返回 `{ status: 'ok' }`
 
 **模块结构**：每个功能模块（auth、user、role、menu）遵循 NestJS 惯例：
+
 ```
 src/{feature}/
   {feature}.module.ts
@@ -70,12 +75,14 @@ src/{feature}/
 ```
 
 **Swagger / OpenAPI**：
+
 - 文档路径：开发环境 `http://localhost:{port}/api-docs`，OpenAPI JSON 通过 `/api-docs-json` 端点获取
 - Swagger CLI 插件已禁用（`nest-cli.json` 无 plugins 配置）——插件会覆盖显式 `@ApiQuery` / `@ApiBody` 类型声明，导致 Apifox 参数识别错误
 - POST 默认 `application/json`，无需 `@ApiConsumes`
 - `@ApiBody` 支持 `examples` 字段提供请求示例：`@ApiBody({ type: LoginDto, examples: { admin: { summary: '管理员登录', value: {...} } } })`
 
 **DTO Swagger 类型注解规则**（Apifox 兼容性关键）：
+
 - ⚠️ TypeScript 联合类型（`number | null`、`string | null`）在运行时无法被 NestJS Swagger 反射，会错误生成为 `type: object`。必须显式加 `type` + `nullable`：
   ```typescript
   @ApiProperty({ type: Number, nullable: true, ... }) parentId: number | null;
@@ -93,11 +100,11 @@ src/{feature}/
 
 ## 关键文件
 
-- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。User 采用软删除（`deletedAt` 字段），Role/Menu 为物理删除。
+- `prisma/schema.prisma` — 数据模型（User、Role、Menu、UserRole、RoleMenu、UserSession）。User 与 Role 通过 UserRole 多对多关联；Role 与 Menu 通过 RoleMenu 多对多关联。Menu 自引用实现树形层级。User 采用软删除（`deletedAt` 字段），Role/Menu 为物理删除。`UserSession` 记录单机登录模式下的活跃 Session（`userId` 主键 + `sessionId`）。
 - `prisma/seed.ts` — 填充管理员/普通用户账号、角色（`super_admin` / `user`）及系统菜单。
 - `src/i18n/` — 翻译文件，按语言/模块拆分 JSON。新增 key 需同时在 zh-CN 和 en 中添加。
 - `src/generated/` — 自动生成文件（Prisma Client + i18n 类型），禁止手动编辑。ESLint/Prettier 已忽略。
-- `src/constant/` — 集中管理常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`config.defaults.ts`（`CONFIG_DEFAULTS` 默认值）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）。
+- `src/constant/` — 集中管理常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`，含 `KICKED_OFF=402`）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`config.defaults.ts`（`CONFIG_DEFAULTS` 默认值）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）、`session-mode.ts`（`SESSION_MODE.SINGLE` / `SESSION_MODE.MULTI` 模式常量）。
 - `src/common/response.ts` — `ApiResponse` 静态类，`success(data, message)` 和 `fail(message)`。message 无默认值，由 Interceptor 传入翻译后的字符串。
 - `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
@@ -111,19 +118,21 @@ src/{feature}/
 
 配置在 `.claude/settings.local.json`，自动检测源码变更并提醒更新本文档：
 
-| Hook | 事件 | 触发时机 |
-|------|------|---------|
+| Hook          | 事件                 | 触发时机                        |
+| ------------- | -------------------- | ------------------------------- |
 | `PostToolUse` | `Bash(git commit *)` | `git commit` 执行后立即注入提醒 |
-| `Stop` | — | 会话结束时兜底检测 |
+| `Stop`        | —                    | 会话结束时兜底检测              |
 
 检测逻辑（`scripts/check-doc-update.sh`）：检查未提交变更 + 最近一次 commit，只要涉及 `.ts`/`.json`/`.prisma`/`.md` 源文件即输出 `additionalContext` 注入到下次会话。
 
 ## 环境配置
 
 启动时通过 `ConfigModule.forRoot` 加载 `.env.{NODE_ENV}` 文件。必需变量：
+
 - `DATABASE_URL` — MySQL 连接字符串（格式：`mysql://user:pass@host:port/db`）
 - `SESSION_SECRET` — Session cookie 签名密钥
 - `SESSION_MAX_AGE` — Session 有效期（毫秒）
+- `SESSION_MODE` — 登录模式（可选，`single` 单机 / `multi` 多机，默认 `multi`）
 - `PORT` — 服务端口号
 - `LOG_LEVEL` — Pino 日志级别（`info` / `debug` / `warn` / `error`）
 - `LOG_PRETTY` — 开发环境设 `true` 启用 pino-pretty 彩色输出
