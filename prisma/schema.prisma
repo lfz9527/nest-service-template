@@ -18,6 +18,7 @@ model User {
   createdAt     DateTime    @default(now())
   updatedAt     DateTime    @updatedAt
   userRoles     UserRole[]
+  sessions      UserSession[]
 }
 
 model Role {
@@ -46,6 +47,12 @@ model Menu {
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   roleMenus RoleMenu[]
+}
+
+model UserSession {
+  userId    Int    @id
+  sessionId String
+  user      User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 
 model UserRole {

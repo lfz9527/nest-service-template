@@ -11,6 +11,8 @@ export const UNAUTHORIZED = 401;
 export const FORBIDDEN = 403;
 /** 请求过于频繁 */
 export const TOO_MANY_REQUESTS = 429;
+/** 已在其他设备登录（被踢下线） */
+export const KICKED_OFF = 402;
 
 // 将 NestJS HttpStatus 枚举统一出口，供全项目使用
 export { HttpStatus };

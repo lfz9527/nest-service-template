@@ -10,3 +10,7 @@ export { API_PATH } from './paths';
 export { PERM } from './permissions';
 // ── 可配置默认值 ──
 export { CONFIG_DEFAULTS } from './config.defaults';
+// ── 被踢下线业务码 ──
+export { KICKED_OFF } from './code';
+// ── Session 模式 ──
+export { SESSION_MODE } from './session-mode';
