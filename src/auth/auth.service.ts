@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus, CONFIG_DEFAULTS, SESSION_MODE } from '../constant';
+import { HttpStatus, EntityStatus, CONFIG_DEFAULTS, SESSION_MODE, PRISMA_CODES } from '../constant';
 import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
@@ -97,7 +97,7 @@ export class AuthService {
     const isSingleMode = process.env.SESSION_MODE === SESSION_MODE.SINGLE;
     if (isSingleMode && userId != null) {
       await this.prisma.userSession.delete({ where: { userId } }).catch((err) => {
-        if (err?.code !== 'P2025') {
+        if (err?.code !== PRISMA_CODES.RECORD_NOT_FOUND) {
           this.logger.error({ userId, err }, 'Failed to delete UserSession');
         }
         // P2025（记录不存在）属正常情况（用户已登出或从未单机登录），忽略

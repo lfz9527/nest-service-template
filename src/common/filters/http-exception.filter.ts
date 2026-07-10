@@ -5,16 +5,7 @@ import { ApiResponse } from '../response';
 import { BusinessException } from '../exceptions/business.exception';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nContext, I18nTranslator } from 'nestjs-i18n';
-
-/** Prisma 错误码常量 */
-const PRISMA_CODES = {
-  UNIQUE_CONSTRAINT: 'P2002',
-  RECORD_NOT_FOUND: 'P2025',
-  FOREIGN_KEY_FAILED: 'P2003',
-  CONSTRAINT_VIOLATION: 'P2014',
-  TABLE_NOT_FOUND: 'P2021',
-  COLUMN_NOT_FOUND: 'P2022',
-} as const;
+import { PRISMA_CODES } from '../../constant';
 
 /**
  * 全局异常过滤器
@@ -62,7 +53,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
       const message = this.t(exception.i18nKey, exception.i18nArgs) || exception.message;
 
       this.logger.warn(
-        { statusCode: httpCode, method: request.method, url: request.url, i18nKey: exception.i18nKey },
+        {
+          statusCode: httpCode,
+          method: request.method,
+          url: request.url,
+          i18nKey: exception.i18nKey,
+        },
         message,
       );
 
@@ -75,13 +71,14 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     // 普通 HttpException：尝试翻译 message，翻译失败则直接用原文
     const message = (() => {
-      try { return this.t(exception.message) || exception.message; } catch { return exception.message; }
+      try {
+        return this.t(exception.message) || exception.message;
+      } catch {
+        return exception.message;
+      }
     })();
 
-    this.logger.warn(
-      { statusCode: httpCode, method: request.method, url: request.url },
-      message,
-    );
+    this.logger.warn({ statusCode: httpCode, method: request.method, url: request.url }, message);
 
     response.status(200).json(ApiResponse.fail(message));
   }
@@ -112,10 +109,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     request: { method: string; url: string },
     response: Response,
   ): void {
-    this.logger.error(
-      { method: request.method, url: request.url },
-      'Prisma validation error',
-    );
+    this.logger.error({ method: request.method, url: request.url }, 'Prisma validation error');
 
     response
       .status(200)
@@ -127,13 +121,9 @@ export class HttpExceptionFilter implements ExceptionFilter {
     request: { method: string; url: string },
     response: Response,
   ): void {
-    const err =
-      error instanceof Error ? error : new Error(String(error));
+    const err = error instanceof Error ? error : new Error(String(error));
 
-    this.logger.error(
-      { method: request.method, url: request.url, stack: err.stack },
-      err.message,
-    );
+    this.logger.error({ method: request.method, url: request.url, stack: err.stack }, err.message);
 
     response
       .status(HttpStatus.INTERNAL_SERVER_ERROR)

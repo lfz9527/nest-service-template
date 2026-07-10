@@ -14,3 +14,5 @@ export { CONFIG_DEFAULTS } from './config.defaults';
 export { KICKED_OFF } from './code';
 // ── Session 模式 ──
 export { SESSION_MODE } from './session-mode';
+// ── Prisma 错误码 ──
+export { PRISMA_CODES } from './prisma-codes';
