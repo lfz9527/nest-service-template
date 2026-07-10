@@ -18,10 +18,15 @@ export const CONFIG_DEFAULTS = {
   },
   /** 限流配置 */
   RATE_LIMIT: {
+    /** 验证码接口限流时间窗口（秒） */
     CAPTCHA_WINDOW_SECONDS: 60,
+    /** 验证码接口窗口内最大请求数 */
     CAPTCHA_MAX: 10,
+    /** 登录接口限流时间窗口（秒） */
     LOGIN_WINDOW_SECONDS: 60,
+    /** 登录接口窗口内最大请求数 */
     LOGIN_MAX: 5,
+    /** 限流记录内存清理间隔（毫秒） */
     CLEANUP_INTERVAL_MS: 60_000,
   },
 } as const;
