@@ -1,7 +1,7 @@
 import { IsOptional, IsString, IsEmail, IsInt, MinLength } from 'class-validator';
 import { i18nValidationMessage } from 'nestjs-i18n';
 import { ApiProperty } from '@nestjs/swagger';
-import { CONFIG_DEFAULTS, EntityStatus } from '../../constant';
+import { EntityStatus } from '../../constant';
 
 export class UpdateUserDto {
   @ApiProperty({ description: '用户名', required: false, example: 'zhangsan' })
@@ -16,7 +16,7 @@ export class UpdateUserDto {
   })
   @IsOptional()
   @IsString()
-  @MinLength(CONFIG_DEFAULTS.PASSWORD_MIN_LENGTH, {
+  @MinLength(Number(process.env.PASSWORD_MIN_LENGTH) || 6, {
     message: i18nValidationMessage('validation.password_min_length'),
   })
   password?: string;

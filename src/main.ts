@@ -7,7 +7,6 @@ import helmet from 'helmet';
 import compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import net from 'net';
-import { CONFIG_DEFAULTS } from './constant';
 
 /**
  * 必须存在的环境变量列表，缺失时启动报错
@@ -33,7 +32,7 @@ function parseDbUrl(url: string) {
   const u = new URL(url);
   return {
     host: u.hostname,
-    port: Number(u.port) || CONFIG_DEFAULTS.DB_DEFAULT_PORT,
+    port: Number(u.port) || Number(process.env.DB_DEFAULT_PORT) || 3306,
     user: u.username,
     password: u.password,
     database: u.pathname.replace('/', ''),
@@ -102,7 +101,7 @@ async function bootstrap() {
 
   const app = await NestFactory.create(AppModule);
 
-  const swaggerConfig = buildSwaggerConfig()
+  const swaggerConfig = buildSwaggerConfig();
   if (swaggerConfig) {
     const document = SwaggerModule.createDocument(app, swaggerConfig);
     SwaggerModule.setup('api-docs', app, document);
@@ -150,7 +149,7 @@ async function bootstrap() {
       cookie: {
         maxAge: Number(process.env.SESSION_MAX_AGE!),
         httpOnly: true,
-        sameSite: CONFIG_DEFAULTS.SESSION_SAME_SITE,
+        sameSite: (process.env.SESSION_SAME_SITE as 'lax' | 'strict' | 'none') || 'lax',
         secure: isProduction,
       },
     }),

@@ -1,5 +1,12 @@
 import { Controller, Get, Post, Body, Query } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiBody, ApiQuery, ApiExtraModels, getSchemaPath } from '@nestjs/swagger';
+import {
+  ApiTags,
+  ApiOperation,
+  ApiBody,
+  ApiQuery,
+  ApiExtraModels,
+  getSchemaPath,
+} from '@nestjs/swagger';
 import { UserService } from './user.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
@@ -8,26 +15,37 @@ import { UserListItemDto } from './dto/user-list-item.dto';
 import { UserDetailDto } from './dto/user-detail.dto';
 import { UserBriefDto } from './dto/user-brief.dto';
 import { PaginationDto } from '../common/dto/pagination.dto';
-import { API_PATH, CONFIG_DEFAULTS } from '../constant';
-import { ApiPaginatedResponse, ApiResponseWrapper, ApiMessageResponse, ApiCommonErrorResponses } from '../common/swagger';
+import { API_PATH } from '../constant';
+import {
+  ApiPaginatedResponse,
+  ApiResponseWrapper,
+  ApiMessageResponse,
+  ApiCommonErrorResponses,
+} from '../common/swagger';
 
 /** 用户管理控制器 — 提供用户的增删改查及角色分配 */
 @ApiTags('api/user')
 @ApiCommonErrorResponses()
 @Controller('api/user')
 export class UserController {
-  constructor(private userService: UserService) { }
+  constructor(private userService: UserService) {}
 
   /** GET /api/user/getUserList — 分页查询用户列表 */
   @ApiOperation({ summary: '获取用户列表' })
   @ApiQuery({ name: 'page', type: Number, required: false, example: 1, description: '页码' })
-  @ApiQuery({ name: 'pageSize', type: Number, required: false, example: 10, description: '每页条数' })
+  @ApiQuery({
+    name: 'pageSize',
+    type: Number,
+    required: false,
+    example: 10,
+    description: '每页条数',
+  })
   @ApiPaginatedResponse(UserListItemDto)
   @Get(API_PATH.USER.LIST)
   getUserList(@Query() dto: PaginationDto) {
     return this.userService.getUserList(
-      dto.page || CONFIG_DEFAULTS.DEFAULT_PAGE,
-      dto.pageSize || CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
+      dto.page || Number(process.env.DEFAULT_PAGE) || 1,
+      dto.pageSize || Number(process.env.DEFAULT_PAGE_SIZE) || 10,
     );
   }
 
@@ -56,7 +74,11 @@ export class UserController {
     schema: {
       allOf: [
         { $ref: getSchemaPath(UpdateUserDto) },
-        { type: 'object', properties: { id: { type: 'number', description: '用户ID', example: 1 } }, required: ['id'] },
+        {
+          type: 'object',
+          properties: { id: { type: 'number', description: '用户ID', example: 1 } },
+          required: ['id'],
+        },
       ],
     },
   })
@@ -68,7 +90,13 @@ export class UserController {
 
   /** POST /api/user/delUser — 软删除用户 */
   @ApiOperation({ summary: '删除用户' })
-  @ApiBody({ schema: { type: 'object', properties: { id: { type: 'number', description: '用户ID', example: 1 } }, required: ['id'] } })
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: { id: { type: 'number', description: '用户ID', example: 1 } },
+      required: ['id'],
+    },
+  })
   @ApiMessageResponse()
   @Post(API_PATH.USER.DELETE)
   delUser(@Body('id') id: number) {
@@ -82,7 +110,12 @@ export class UserController {
       type: 'object',
       properties: {
         userId: { type: 'number', description: '用户ID', example: 1 },
-        roleIds: { type: 'array', items: { type: 'number' }, description: '角色ID数组', example: [1, 2] },
+        roleIds: {
+          type: 'array',
+          items: { type: 'number' },
+          description: '角色ID数组',
+          example: [1, 2],
+        },
       },
       required: ['userId', 'roleIds'],
     },

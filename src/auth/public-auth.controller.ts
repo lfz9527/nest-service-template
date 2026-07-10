@@ -12,7 +12,7 @@ import { LoginDto } from './dto/login.dto';
 import { LoginResultDto } from './dto/login-result.dto';
 import { AppSession } from '../common/types';
 import { RateLimit } from '../common/decorators/rate-limit.decorator';
-import { API_PATH, CONFIG_DEFAULTS } from '../constant';
+import { API_PATH } from '../constant';
 import { ApiResponseWrapper, ApiMessageResponse, ApiResponseWrapperDto } from '../common/swagger';
 import { I18nService } from 'nestjs-i18n';
 
@@ -43,8 +43,8 @@ export class PublicAuthController {
     },
   })
   @RateLimit({
-    windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_WINDOW_SECONDS,
-    max: CONFIG_DEFAULTS.RATE_LIMIT.CAPTCHA_MAX,
+    windowSeconds: Number(process.env.RATE_LIMIT_CAPTCHA_WINDOW_SECONDS) || 60,
+    max: Number(process.env.RATE_LIMIT_CAPTCHA_MAX) || 10,
   })
   @Get(API_PATH.AUTH.CAPTCHA)
   getCaptcha(@Session() session: AppSession) {
@@ -58,8 +58,8 @@ export class PublicAuthController {
   @ApiResponseWrapper(LoginResultDto)
   @ApiResponse({ status: 400, description: '验证码错误或账号密码不匹配' })
   @RateLimit({
-    windowSeconds: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_WINDOW_SECONDS,
-    max: CONFIG_DEFAULTS.RATE_LIMIT.LOGIN_MAX,
+    windowSeconds: Number(process.env.RATE_LIMIT_LOGIN_WINDOW_SECONDS) || 60,
+    max: Number(process.env.RATE_LIMIT_LOGIN_MAX) || 5,
   })
   @Post(API_PATH.AUTH.LOGIN)
   login(

@@ -5,7 +5,7 @@ import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, EntityStatus, CONFIG_DEFAULTS, SESSION_MODE, PRISMA_CODES } from '../constant';
+import { HttpStatus, EntityStatus, SESSION_MODE, PRISMA_CODES } from '../constant';
 import { PinoLogger } from 'nestjs-pino';
 
 @Injectable()
@@ -19,8 +19,8 @@ export class AuthService {
 
   generateCaptcha(session: AppSession): string {
     const captcha = svgCaptcha.create({
-      size: CONFIG_DEFAULTS.CAPTCHA.SIZE,
-      noise: CONFIG_DEFAULTS.CAPTCHA.NOISE,
+      size: Number(process.env.CAPTCHA_SIZE) || 4,
+      noise: Number(process.env.CAPTCHA_NOISE) || 2,
       color: true,
     });
     session.captcha = captcha.text.toLowerCase();

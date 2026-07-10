@@ -5,7 +5,7 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
 import { BusinessException } from '../common/exceptions/business.exception';
-import { HttpStatus, CONFIG_DEFAULTS, PRISMA_CODES } from '../constant';
+import { HttpStatus, PRISMA_CODES } from '../constant';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
@@ -21,8 +21,8 @@ export class UserService {
   }
 
   async getUserList(
-    page: number = CONFIG_DEFAULTS.DEFAULT_PAGE,
-    pageSize: number = CONFIG_DEFAULTS.DEFAULT_PAGE_SIZE,
+    page: number = Number(process.env.DEFAULT_PAGE) || 1,
+    pageSize: number = Number(process.env.DEFAULT_PAGE_SIZE) || 10,
   ) {
     const skip = (page - 1) * pageSize;
     const where = {};
@@ -75,7 +75,10 @@ export class UserService {
     if (existing) {
       throw new BusinessException(HttpStatus.BAD_REQUEST, 'user.username_exists');
     }
-    const passwordHash = await bcrypt.hash(dto.password, CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
+    const passwordHash = await bcrypt.hash(
+      dto.password,
+      Number(process.env.BCRYPT_SALT_ROUNDS) || 10,
+    );
     const newUser = await this.prisma.user.create({
       data: {
         username: dto.username,
@@ -105,7 +108,7 @@ export class UserService {
 
     const data: Record<string, unknown> = { ...rest };
     if (password) {
-      data.passwordHash = await bcrypt.hash(password, CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
+      data.passwordHash = await bcrypt.hash(password, Number(process.env.BCRYPT_SALT_ROUNDS) || 10);
     }
     const updated = await this.prisma.user.update({
       where: { id },

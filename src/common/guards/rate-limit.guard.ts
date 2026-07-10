@@ -2,7 +2,7 @@ import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
 import { BusinessException } from '../exceptions/business.exception';
-import { TOO_MANY_REQUESTS, HttpStatus, CONFIG_DEFAULTS } from '../../constant';
+import { TOO_MANY_REQUESTS, HttpStatus } from '../../constant';
 
 interface HitRecord {
   count: number;
@@ -45,25 +45,26 @@ export class RateLimitGuard implements CanActivate {
 
     record.count++;
     if (record.count > options.max) {
-      throw new BusinessException(
-        HttpStatus.TOO_MANY_REQUESTS,
-        'rate_limit.too_many_requests',
-        { businessCode: TOO_MANY_REQUESTS },
-      );
+      throw new BusinessException(HttpStatus.TOO_MANY_REQUESTS, 'rate_limit.too_many_requests', {
+        businessCode: TOO_MANY_REQUESTS,
+      });
     }
 
     return true;
   }
 
   private startCleanup(): void {
-    this.cleanupTimer = setInterval(() => {
-      const now = Date.now();
-      for (const [key, record] of this.store) {
-        if (now > record.resetAt) {
-          this.store.delete(key);
+    this.cleanupTimer = setInterval(
+      () => {
+        const now = Date.now();
+        for (const [key, record] of this.store) {
+          if (now > record.resetAt) {
+            this.store.delete(key);
+          }
         }
-      }
-    }, CONFIG_DEFAULTS.RATE_LIMIT.CLEANUP_INTERVAL_MS);
+      },
+      Number(process.env.RATE_LIMIT_CLEANUP_INTERVAL_MS) || 60_000,
+    );
   }
 
   onModuleDestroy(): void {

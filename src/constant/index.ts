@@ -8,8 +8,6 @@ export { SUPER_ADMIN, USER } from './role-code';
 export { API_PATH } from './paths';
 // ── 权限码 ──
 export { PERM } from './permissions';
-// ── 可配置默认值 ──
-export { CONFIG_DEFAULTS } from './config.defaults';
 // ── 被踢下线业务码 ──
 export { KICKED_OFF } from './code';
 // ── Session 模式 ──
