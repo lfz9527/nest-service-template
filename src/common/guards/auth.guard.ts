@@ -1,5 +1,5 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
-import { BusinessException } from '../exceptions/business.exception';
+import { BusinessException } from '../business.exception';
 import { PrismaService } from '../../prisma/prisma.service';
 import { UNAUTHORIZED, KICKED_OFF, HttpStatus, API_PATH, SESSION_MODE } from '../../constant';
 

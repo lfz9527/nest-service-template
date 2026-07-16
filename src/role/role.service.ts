@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessException } from '../common/business.exception';
 import { HttpStatus } from '../constant';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateRoleDto } from './dto/create-role.dto';
@@ -43,8 +43,7 @@ export class RoleService {
     const existing = await this.prisma.role.findFirst({
       where: { OR: [{ name: dto.name }, { code: dto.code }] },
     });
-    if (existing)
-      throw new BusinessException(HttpStatus.BAD_REQUEST, 'role.name_or_code_exists');
+    if (existing) throw new BusinessException(HttpStatus.BAD_REQUEST, 'role.name_or_code_exists');
     const newRole = await this.prisma.role.create({ data: dto });
     this.logger.info({ roleId: newRole.id, name: newRole.name }, 'Role created');
     return newRole;

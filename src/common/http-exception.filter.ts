@@ -1,11 +1,11 @@
 import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
-import { Prisma } from '../../generated/prisma/client';
+import { Prisma } from '../generated/prisma/client';
 import { Response } from 'express';
-import { ApiResponse } from '../response';
-import { BusinessException } from '../exceptions/business.exception';
+import { ApiResponse } from './response';
+import { BusinessException } from './business.exception';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nContext, I18nTranslator } from 'nestjs-i18n';
-import { PRISMA_CODES } from '../../constant';
+import { PRISMA_CODES } from '../constant';
 
 /**
  * 全局异常过滤器

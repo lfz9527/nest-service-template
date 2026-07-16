@@ -14,7 +14,7 @@ import { AssignRolesDto } from './dto/assign-roles.dto';
 import { UserListItemDto } from './dto/user-list-item.dto';
 import { UserDetailDto } from './dto/user-detail.dto';
 import { UserBriefDto } from './dto/user-brief.dto';
-import { PaginationDto } from '../common/dto/pagination.dto';
+import { PaginationDto } from '../common/pagination.dto';
 import { API_PATH } from '../constant';
 import {
   ApiPaginatedResponse,

@@ -7,8 +7,8 @@ import { UserController } from './user.controller';
 import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
-import { ResponseInterceptor } from '../common/interceptors/response.interceptor';
-import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
+import { ResponseInterceptor } from '../common/response.interceptor';
+import { HttpExceptionFilter } from '../common/http-exception.filter';
 import request from 'supertest';
 
 class MockAuthGuard implements CanActivate {

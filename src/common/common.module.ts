@@ -3,8 +3,8 @@ import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { DevGuard } from './guards/dev.guard';
 import { RateLimitGuard } from './guards/rate-limit.guard';
-import { HttpExceptionFilter } from './filters/http-exception.filter';
-import { ResponseInterceptor } from './interceptors/response.interceptor';
+import { HttpExceptionFilter } from './http-exception.filter';
+import { ResponseInterceptor } from './response.interceptor';
 
 /**
  * 全局通用模块

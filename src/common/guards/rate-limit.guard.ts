@@ -1,7 +1,7 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { RATE_LIMIT_KEY, RateLimitOptions } from '../decorators/rate-limit.decorator';
-import { BusinessException } from '../exceptions/business.exception';
+import { BusinessException } from '../business.exception';
 import { TOO_MANY_REQUESTS, HttpStatus } from '../../constant';
 
 interface HitRecord {

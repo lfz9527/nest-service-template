@@ -4,7 +4,7 @@ import { UserService } from './user.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
-import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessException } from '../common/business.exception';
 import * as bcrypt from 'bcryptjs';
 
 jest.mock('bcryptjs');

@@ -4,7 +4,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { AssignRolesDto } from './dto/assign-roles.dto';
 import * as bcrypt from 'bcryptjs';
-import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessException } from '../common/business.exception';
 import { HttpStatus, PRISMA_CODES } from '../constant';
 import { ListResult } from '../common/response';
 import { PinoLogger } from 'nestjs-pino';

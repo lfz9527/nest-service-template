@@ -4,7 +4,7 @@ import * as svgCaptcha from 'svg-captcha';
 import * as bcrypt from 'bcryptjs';
 import { LoginDto } from './dto/login.dto';
 import { AppSession, MenuTreeNode } from '../common/types';
-import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessException } from '../common/business.exception';
 import { HttpStatus, EntityStatus, SESSION_MODE, PRISMA_CODES } from '../constant';
 import { PinoLogger } from 'nestjs-pino';
 

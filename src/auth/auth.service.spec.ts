@@ -3,7 +3,7 @@ import { mockDeep, MockProxy } from 'jest-mock-extended';
 import { AuthService } from './auth.service';
 import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
-import { BusinessException } from '../common/exceptions/business.exception';
+import { BusinessException } from '../common/business.exception';
 import * as svgCaptcha from 'svg-captcha';
 import * as bcrypt from 'bcryptjs';
 
