@@ -1,0 +1,43 @@
+# Dependencies
+node_modules/
+.pnpm-store/
+
+# Build output (will be rebuilt in Docker)
+dist/
+
+# Environment files (secrets not for the image)
+.env
+.env.*
+!.env.example
+
+# Git
+.git/
+.gitignore
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Test coverage
+coverage/
+
+# Cache
+.eslintcache
+tsconfig.tsbuildinfo
+
+# Docs (not needed at runtime)
+docs/
+
+# Misc
+*.md
+!CLAUDE.md
