@@ -123,10 +123,10 @@ src/{feature}/
 
 **框架**：Jest + ts-jest + supertest + jest-mock-extended。
 
-- 配置：`jest.config.ts`（单元/集成测试，diagnostics 关闭以兼容 Prisma deep mock）+ `test/jest-e2e.json`（e2e 测试）
-- 单元测试（`test/unit/`）：Mock PrismaService + PinoLogger + I18nService，纯 Service 层业务逻辑，57 条用例
-- 集成测试（`test/integration/`）：启动 NestJS 测试容器 + Mock 依赖，验证 Controller 输入输出
-- e2e 冒烟（`test/e2e/`）：完整 AppModule，需 DATABASE_URL 配置的真实数据库
+- 配置：`jest.config.ts`（单元/集成测试，diagnostics 关闭以兼容 Prisma deep mock）+ `jest-e2e.json`（e2e 测试）
+- 测试与源码同模块共置：`src/{module}/*.spec.ts`（单元/集成）、`src/app.e2e-spec.ts`（e2e 冒烟）
+- Mock PrismaService + PinoLogger + I18nService，纯 Service 层业务逻辑
+- e2e 冒烟：完整 AppModule，需 DATABASE_URL 配置的真实数据库
 - 覆盖率阈值：statements/lines 50%，branches/functions 48%
 
 ## 容器化部署
