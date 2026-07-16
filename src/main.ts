@@ -8,6 +8,22 @@ import compression from 'compression';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import net from 'net';
 
+// ── 进程级异常兜底（Node.js Best Practices 1.4）────────────────────────
+// 注册时机尽可能早，确保加载阶段抛出的异常也能被捕获。
+// 两个处理器均调用 process.exit(1)，由进程管理器（Docker/K8s/PM2）负责自动重启。
+process.on('unhandledRejection', (reason: unknown) => {
+  const message = reason instanceof Error ? reason.message : String(reason);
+  const stack = reason instanceof Error ? reason.stack : undefined;
+  console.error('[unhandledRejection]', message, stack ?? '');
+  process.exit(1);
+});
+
+process.on('uncaughtException', (error: Error) => {
+  console.error('[uncaughtException]', error.message, error.stack ?? '');
+  // 编程错误属于不可恢复状态，必须立即退出
+  process.exit(1);
+});
+
 /**
  * 必须存在的环境变量列表，缺失时启动报错
  */

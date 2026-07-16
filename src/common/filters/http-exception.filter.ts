@@ -62,7 +62,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         message,
       );
 
-      response.status(200).json({
+      response.status(httpCode).json({
         ...ApiResponse.fail(message),
         code: exception.businessCode,
       });
@@ -80,7 +80,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
 
     this.logger.warn({ statusCode: httpCode, method: request.method, url: request.url }, message);
 
-    response.status(200).json(ApiResponse.fail(message));
+    response.status(httpCode).json(ApiResponse.fail(message));
   }
 
   private handlePrismaError(
@@ -90,6 +90,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
   ): void {
     const { key, args } = this.resolvePrismaErrorKey(error);
     const message = this.t(key, args) || key;
+    const httpCode = this.resolvePrismaHttpCode(error.code);
 
     this.logger.error(
       {
@@ -101,7 +102,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
       message,
     );
 
-    response.status(200).json(ApiResponse.fail(message));
+    response.status(httpCode).json(ApiResponse.fail(message));
   }
 
   private handlePrismaValidationError(
@@ -112,7 +113,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
     this.logger.error({ method: request.method, url: request.url }, 'Prisma validation error');
 
     response
-      .status(200)
+      .status(HttpStatus.BAD_REQUEST)
       .json(ApiResponse.fail(this.t('common.bad_request') || 'common.bad_request'));
   }
 
@@ -141,6 +142,20 @@ export class HttpExceptionFilter implements ExceptionFilter {
       return i18n.t(key as Parameters<typeof i18n.t>[0], { args }) as unknown as string;
     } catch {
       return undefined;
+    }
+  }
+
+  private resolvePrismaHttpCode(code: string): number {
+    switch (code) {
+      case PRISMA_CODES.UNIQUE_CONSTRAINT:
+        return HttpStatus.CONFLICT;
+      case PRISMA_CODES.RECORD_NOT_FOUND:
+        return HttpStatus.NOT_FOUND;
+      case PRISMA_CODES.FOREIGN_KEY_FAILED:
+      case PRISMA_CODES.CONSTRAINT_VIOLATION:
+        return HttpStatus.BAD_REQUEST;
+      default:
+        return HttpStatus.INTERNAL_SERVER_ERROR;
     }
   }
 
