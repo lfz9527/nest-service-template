@@ -2,13 +2,13 @@ import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication, CanActivate, ExecutionContext } from '@nestjs/common';
 import { APP_GUARD, APP_INTERCEPTOR, APP_FILTER } from '@nestjs/core';
 import { mockDeep } from 'jest-mock-extended';
-import { UserService } from '../../src/user/user.service';
-import { UserController } from '../../src/user/user.controller';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { UserService } from './user.service';
+import { UserController } from './user.controller';
+import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
-import { ResponseInterceptor } from '../../src/common/interceptors/response.interceptor';
-import { HttpExceptionFilter } from '../../src/common/filters/http-exception.filter';
+import { ResponseInterceptor } from '../common/interceptors/response.interceptor';
+import { HttpExceptionFilter } from '../common/filters/http-exception.filter';
 import request from 'supertest';
 
 class MockAuthGuard implements CanActivate {

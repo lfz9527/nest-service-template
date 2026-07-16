@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, MockProxy } from 'jest-mock-extended';
-import { RoleService } from '../../src/role/role.service';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { RoleService } from './role.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
-import { BusinessException } from '../../src/common/exceptions/business.exception';
+import { BusinessException } from '../common/exceptions/business.exception';
 
 describe('RoleService (unit)', () => {
   let service: RoleService;

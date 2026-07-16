@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, MockProxy } from 'jest-mock-extended';
-import { AuthService } from '../../src/auth/auth.service';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { AuthService } from './auth.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
-import { BusinessException } from '../../src/common/exceptions/business.exception';
+import { BusinessException } from '../common/exceptions/business.exception';
 import * as svgCaptcha from 'svg-captcha';
 import * as bcrypt from 'bcryptjs';
 

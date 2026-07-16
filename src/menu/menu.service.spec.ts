@@ -1,10 +1,10 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { mockDeep, MockProxy } from 'jest-mock-extended';
-import { MenuService } from '../../src/menu/menu.service';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { MenuService } from './menu.service';
+import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
-import { BusinessException } from '../../src/common/exceptions/business.exception';
+import { BusinessException } from '../common/exceptions/business.exception';
 
 describe('MenuService (unit)', () => {
   let service: MenuService;

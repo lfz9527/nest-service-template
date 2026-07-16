@@ -1,9 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import { mockDeep } from 'jest-mock-extended';
-import { AuthService } from '../../src/auth/auth.service';
-import { PublicAuthController } from '../../src/auth/public-auth.controller';
-import { PrismaService } from '../../src/prisma/prisma.service';
+import { AuthService } from './auth.service';
+import { PublicAuthController } from './public-auth.controller';
+import { PrismaService } from '../prisma/prisma.service';
 import { PinoLogger } from 'nestjs-pino';
 import { I18nService } from 'nestjs-i18n';
 import session from 'express-session';
