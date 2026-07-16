@@ -3,7 +3,6 @@ import { PrismaMariaDb } from '@prisma/adapter-mariadb';
 import * as bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 import { EntityStatus } from '../src/constant';
-import { CONFIG_DEFAULTS } from '../src/constant';
 import { PERM } from '../src/constant';
 import { SUPER_ADMIN, USER } from '../src/constant';
 
@@ -16,7 +15,8 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
-  const passwordHash = await bcrypt.hash('admin123', CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS);
+  const saltRounds = Number(process.env.BCRYPT_SALT_ROUNDS) || 10;
+  const passwordHash = await bcrypt.hash('admin123', saltRounds);
   const adminUser = await prisma.user.upsert({
     where: { username: 'admin' },
     update: {},
@@ -43,9 +43,30 @@ async function main() {
 
   const menuData = [
     { name: '系统管理', code: 'system', path: '/system', icon: 'setting', sortOrder: 1 },
-    { name: '用户管理', code: PERM.USER.LIST, path: '/system/user', icon: 'user', sortOrder: 1, parentCode: 'system' },
-    { name: '角色管理', code: PERM.ROLE.LIST, path: '/system/role', icon: 'team', sortOrder: 2, parentCode: 'system' },
-    { name: '菜单管理', code: PERM.MENU.LIST, path: '/system/menu', icon: 'menu', sortOrder: 3, parentCode: 'system' },
+    {
+      name: '用户管理',
+      code: PERM.USER.LIST,
+      path: '/system/user',
+      icon: 'user',
+      sortOrder: 1,
+      parentCode: 'system',
+    },
+    {
+      name: '角色管理',
+      code: PERM.ROLE.LIST,
+      path: '/system/role',
+      icon: 'team',
+      sortOrder: 2,
+      parentCode: 'system',
+    },
+    {
+      name: '菜单管理',
+      code: PERM.MENU.LIST,
+      path: '/system/menu',
+      icon: 'menu',
+      sortOrder: 3,
+      parentCode: 'system',
+    },
   ];
 
   const menuMap = new Map<string, number>();
@@ -99,7 +120,7 @@ async function main() {
     update: {},
     create: {
       username: 'user',
-      passwordHash: await bcrypt.hash('user123', CONFIG_DEFAULTS.BCRYPT_SALT_ROUNDS),
+      passwordHash: await bcrypt.hash('user123', saltRounds),
       email: 'user@example.com',
       status: EntityStatus.ENABLED,
     },
