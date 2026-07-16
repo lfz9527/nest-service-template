@@ -1,13 +1,14 @@
 import { Injectable, CanActivate, ExecutionContext } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { BusinessException } from '../business.exception';
-import { FORBIDDEN, HttpStatus, EntityStatus } from '../../constant';
+import { FORBIDDEN, HttpStatus, EntityStatus, SUPER_ADMIN } from '../../constant';
 import { PrismaService } from '../../prisma/prisma.service';
 import { PERMISSION_KEY } from '../decorators/permissions.decorator';
 
 /**
  * 权限校验守卫
  * 检查当前登录用户是否拥有路由所要求的菜单权限码。
+ * 超级管理员（super_admin 角色）直接放行，无需逐一匹配菜单权限。
  * 未标记 @Permissions() 的路由直接放行。
  */
 @Injectable()
@@ -53,6 +54,14 @@ export class PermissionGuard implements CanActivate {
       throw new BusinessException(HttpStatus.FORBIDDEN, 'permission.forbidden', {
         businessCode: FORBIDDEN,
       });
+    }
+
+    // 超级管理员拥有全部权限，直接放行（解决权限引导问题，无需为超管维护菜单数据）
+    const isSuperAdmin = userWithRoles.userRoles.some(
+      (ur) => ur.role.status === EntityStatus.ENABLED && ur.role.code === SUPER_ADMIN,
+    );
+    if (isSuperAdmin) {
+      return true;
     }
 
     const menuCodes = new Set<string>();

@@ -15,7 +15,8 @@ import { UserListItemDto } from './dto/user-list-item.dto';
 import { UserDetailDto } from './dto/user-detail.dto';
 import { UserBriefDto } from './dto/user-brief.dto';
 import { PaginationDto } from '../common/pagination.dto';
-import { API_PATH } from '../constant';
+import { API_PATH, PERM } from '../constant';
+import { Permissions } from '../common/decorators/permissions.decorator';
 import {
   ApiPaginatedResponse,
   ApiResponseWrapper,
@@ -41,6 +42,7 @@ export class UserController {
     description: '每页条数',
   })
   @ApiPaginatedResponse(UserListItemDto)
+  @Permissions(PERM.USER.LIST)
   @Get(API_PATH.USER.LIST)
   getUserList(@Query() dto: PaginationDto) {
     return this.userService.getUserList(
@@ -53,6 +55,7 @@ export class UserController {
   @ApiOperation({ summary: '获取用户详情（含角色）' })
   @ApiQuery({ name: 'id', type: Number, required: true, example: 1, description: '用户ID' })
   @ApiResponseWrapper(UserDetailDto)
+  @Permissions(PERM.USER.LIST)
   @Get(API_PATH.USER.BY_ID)
   getUserById(@Query('id') id: string) {
     return this.userService.getUserById(Number(id));
@@ -62,6 +65,7 @@ export class UserController {
   @ApiOperation({ summary: '新增用户' })
   @ApiBody({ type: CreateUserDto })
   @ApiResponseWrapper(UserBriefDto)
+  @Permissions(PERM.USER.ADD)
   @Post(API_PATH.USER.ADD)
   addUser(@Body() dto: CreateUserDto) {
     return this.userService.addUser(dto);
@@ -83,6 +87,7 @@ export class UserController {
     },
   })
   @ApiResponseWrapper(UserBriefDto)
+  @Permissions(PERM.USER.UPDATE)
   @Post(API_PATH.USER.UPDATE)
   updateUser(@Body() dto: UpdateUserDto & { id: number }) {
     return this.userService.updateUser(dto);
@@ -98,6 +103,7 @@ export class UserController {
     },
   })
   @ApiMessageResponse()
+  @Permissions(PERM.USER.DELETE)
   @Post(API_PATH.USER.DELETE)
   delUser(@Body('id') id: number) {
     return this.userService.delUser(Number(id));
@@ -121,6 +127,7 @@ export class UserController {
     },
   })
   @ApiMessageResponse()
+  @Permissions(PERM.USER.ASSIGN_ROLE)
   @Post(API_PATH.USER.ASSIGN_ROLES)
   assignRoles(@Body('userId') userId: number, @Body() body: AssignRolesDto) {
     return this.userService.assignRoles(Number(userId), body);

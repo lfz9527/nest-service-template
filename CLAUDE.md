@@ -41,7 +41,7 @@ npm run db:setup         # 首次迁移 + 种子数据一步完成
 
 **认证流程**：Express Session 存储在 MySQL 中（express-mysql-session）。`AuthGuard` 检查 `session.userId` —— 不存在则视为未登录。公开接口以 `/public/` 为前缀，在 AuthGuard 中按路径放行。支持单机/多机登录模式：`SESSION_MODE=single` 时 `UserSession` 表记录当前活跃 Session，登录时踢旧、AuthGuard 校验 sessionId 不匹配则返回 402；默认 `multi` 保持原有行为。
 
-**授权模型**：User → UserRole → Role → RoleMenu → Menu。每条 `Menu` 记录有一个 `code` 字段（如 `user:list`、`role:delete`）。在路由上使用 `@Permissions(code)` 装饰器声明所需权限码；`PermissionGuard` 查询当前用户的启用角色及其启用菜单，判断是否拥有该权限码。未标注 `@Permissions()` 的路由对所有已登录用户开放。
+**授权模型**：User → UserRole → Role → RoleMenu → Menu。每条 `Menu` 记录有一个 `code` 字段（如 `user:list`、`role:delete`）。在路由上使用 `@Permissions(code)` 装饰器声明所需权限码；`PermissionGuard`（全局注册）查询当前用户的启用角色及其启用菜单，判断是否拥有该权限码。**超级管理员（`super_admin` 角色）直接放行**，无需逐一匹配菜单——既解决权限引导问题（超管天然拥有全部权限），也让权限码与菜单数据解耦，新增权限码无需同步维护菜单。未标注 `@Permissions()` 的路由对所有已登录用户开放（如 `/api/auth/getUserInfo` 查询自身信息）。`api/{user,role,menu}` 下的接口已按 `PERM` 常量全部标注权限码。
 
 **全局处理管线**（在 `CommonModule` 中注册）：
 

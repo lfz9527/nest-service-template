@@ -2,6 +2,7 @@ import { Global, Module } from '@nestjs/common';
 import { APP_GUARD, APP_FILTER, APP_INTERCEPTOR } from '@nestjs/core';
 import { AuthGuard } from './guards/auth.guard';
 import { DevGuard } from './guards/dev.guard';
+import { PermissionGuard } from './guards/permission.guard';
 import { RateLimitGuard } from './guards/rate-limit.guard';
 import { HttpExceptionFilter } from './http-exception.filter';
 import { ResponseInterceptor } from './response.interceptor';
@@ -18,6 +19,8 @@ import { ResponseInterceptor } from './response.interceptor';
     { provide: APP_GUARD, useClass: RateLimitGuard },
     // 全局登录认证守卫 —— 拦截未登录请求
     { provide: APP_GUARD, useClass: AuthGuard },
+    // 全局权限守卫 —— 校验 @Permissions 声明的权限码（超管放行）
+    { provide: APP_GUARD, useClass: PermissionGuard },
     // 全局开发环境守卫 —— 生产环境禁用 @DevOnly 标记的接口
     { provide: APP_GUARD, useClass: DevGuard },
     // 全局响应拦截器 —— 统一包装返回格式
