@@ -11,6 +11,7 @@ dist
 pnpm-lock.yaml
 tsconfig.build.tsbuildinfo
 tsconfig.tsbuildinfo
+coverage
 
 
 .superpowers
