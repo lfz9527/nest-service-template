@@ -111,9 +111,9 @@ src/{feature}/
 - `src/generated/` — 自动生成文件（Prisma Client + i18n 类型），禁止手动编辑。ESLint/Prettier 已忽略。
 - `src/constant/` — 集中管理常量，barrel 导出。`code.ts`（业务码 + `EntityStatus` 枚举 + `HttpStatus`，含 `KICKED_OFF=402`）、`paths.ts`（`API_PATH` 路由）、`permissions.ts`（`PERM` 权限码）、`role-code.ts`（`SUPER_ADMIN` / `USER` 角色编码）、`session-mode.ts`（`SESSION_MODE.SINGLE` / `SESSION_MODE.MULTI` 模式常量）、`prisma-codes.ts`（`PRISMA_CODES` Prisma 错误码常量）。
 - `src/common/response.ts` — `ApiResponse` 静态类，`success(data, message)` 和 `fail(message)`。message 无默认值，由 Interceptor 传入翻译后的字符串。
-- `src/common/exceptions/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
+- `src/common/business.exception.ts` — `BusinessException` 继承 `HttpException`，构造签名 `(httpCode, i18nKey, options?)`，options 可选 `businessCode` / `args`。
 - `src/common/types.ts` — `AppSession`（Session + userId + captcha）、`MenuTreeNode` 类型。
-- `src/common/dto/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
+- `src/common/pagination.dto.ts` — 可复用分页 DTO，含 `page`/`pageSize`（可选，最小 1），`@Type(() => Number)` 自动做 query → number 转换。
 - `src/common/swagger/response-wrapper.ts` — 统一响应包装装饰器（`ApiResponseWrapper`、`ApiPaginatedResponse`、`ApiArrayResponse`、`ApiMessageResponse`、`ApiHealthResponse`、`ApiCommonErrorResponses`）。
 - `scripts/check-doc-update.sh` — `Stop` + `PostToolUse` hook 脚本，检测源码变更并注入 CLAUDE.md 更新提醒。
 - `.claude/settings.local.json` — 项目级本地设置（权限、hooks），不提交到仓库。
