@@ -10,6 +10,7 @@ export type I18nTranslations = {
         "captcha_wrong": string;
         "login_failed": string;
         "login_required": string;
+        "kicked_off": string;
         "logout_success": string;
     };
     "common": {
